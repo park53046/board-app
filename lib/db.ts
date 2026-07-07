@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@/lib/generated/prisma/client";
 
 function createPrismaClient() {
@@ -10,7 +10,7 @@ function createPrismaClient() {
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
   const libsql = createClient({ url, authToken });
-  const adapter = new PrismaLibSQL(libsql);
+  const adapter = new PrismaLibSql(libsql);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new PrismaClient({ adapter } as any);
 }
