@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 폼 입력 글자색 - 다크모드에서도 항상 진하게 보이도록 */
+input,
+textarea,
+select,
+option {
+  color: #111827;
+  background-color: #fff;
+  color-scheme: light;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+.nav-btn {
+  display: inline-block;
+  background-color: #f5f5dc;
+  color: #1a2b4a;
+  border: 1px solid #1a2b4a;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.nav-btn:hover {
+  background-color: #aab4cc;
+}
+
+.nav-btn:active {
+  transform: scale(0.8);
+}
+
+/* 담당 과목 버튼 */
+.subject-btn {
+  display: inline-block;
+  background: #1f6feb22;
+  color: #58a6ff;
+  border: 1px solid #1f6feb55;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s,
+    box-shadow 0.15s;
+}
+
+.subject-btn:hover {
+  background: #1f6feb44;
+  border-color: #58a6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(88, 166, 255, 0.25);
+}
+
+.subject-btn:active {
+  transform: scale(0.92);
+  background: #1f6feb66;
+}

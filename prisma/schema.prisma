@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+}
+
+// 게시판 회원
+model User {
+  id        Int         @id @default(autoincrement())
+  affil     String      // 소속 (예: 동해삼육고)
+  studentId String      @unique // 학번
+  name      String      // 성명
+  password  String      // scrypt 해시
+  posts     BoardPost[]
+  createdAt DateTime    @default(now())
+}
+
+// 학습 소감 게시글 (작성자 본인만 열람 가능)
+model BoardPost {
+  id        Int      @id @default(autoincrement())
+  subject   String   // 과목
+  title     String
+  content   String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
