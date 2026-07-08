@@ -94,6 +94,7 @@ export default function IntroPage() {
           <span className="dot red" />
           <span className="dot yellow" />
           <span className="dot green" />
+          <span className="titlebar-text">AI 선도학교 동해삼육!</span>
         </header>
 
         {/* ── 본문 ── */}
@@ -297,6 +298,12 @@ export default function IntroPage() {
           margin-left: 8px;
           color: #8b949e;
           font-size: 13px;
+        }
+        .titlebar-text {
+          margin-left: 12px;
+          color: #58a6ff;
+          font-size: 14px;
+          font-weight: 700;
         }
         .body {
           padding: 28px 28px 36px;
