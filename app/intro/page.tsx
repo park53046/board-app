@@ -15,7 +15,7 @@ import { addNoticeAction } from "./actions";
 export default function IntroPage() {
   // 타이핑 효과용 상태
   const [typed, setTyped] = useState("");
-  const fullText = "안녕하세요, AI담당 교사 ViKi입니다.";
+  const fullText = "안녕하세요! AI담당 교사 ViKi입니다!";
   const isTypingDone = typed.length >= fullText.length;
 
   useEffect(() => {
@@ -94,16 +94,12 @@ export default function IntroPage() {
           <span className="dot red" />
           <span className="dot yellow" />
           <span className="dot green" />
-          <span className="filename">intro.tsx</span>
         </header>
 
         {/* ── 본문 ── */}
         <div className="body">
           {/* HERO */}
           <section className="hero">
-            <p className="prompt">
-              <span className="caret">~/profile $</span> whoami
-            </p>
             <h1 className="typed">
               {typed}
               {!isTypingDone && <span className="cursor">▋</span>}
