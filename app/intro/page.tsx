@@ -110,15 +110,23 @@ export default function IntroPage() {
             </h1>
 
             <div className="namecard">
-              <h2 className="name">
-                {profile.name}{" "}
-                <span className="name-en">/ {profile.nameEn}</span>
-              </h2>
-              <h2 className="phone">{profile.phone}</h2>
-              <p className="role">{profile.role}</p>
-              <p className="meta">
-                📍 {profile.school} · {profile.location}
-              </p>
+              <div className="namecard-info">
+                <h2 className="name">
+                  {profile.name}{" "}
+                  <span className="name-en">/ {profile.nameEn}</span>
+                </h2>
+                <h2 className="phone">{profile.phone}</h2>
+                <p className="role">{profile.role}</p>
+                <p className="meta">
+                  📍 {profile.school} · {profile.location}
+                </p>
+              </div>
+              {/* 이름 우측 사진 — public/teacher.jpg 파일 필요 */}
+              <img
+                src="/teacher.gif"
+                alt={`${profile.name} 교사`}
+                className="profile-photo"
+              />
             </div>
           </section>
 
@@ -330,6 +338,25 @@ export default function IntroPage() {
         .namecard {
           border-left: 3px solid #58a6ff;
           padding-left: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .namecard-info {
+          flex: 1;
+          min-width: 200px;
+        }
+        /* 사진 크기 조절: width 값만 바꾸면 됩니다 (예: 100px, 160px) */
+        .profile-photo {
+          width: 130px;
+          height: auto;
+          border-radius: 10px;
+          border: 1px solid #30363d;
+          background: #fff;
+          object-fit: cover;
+          flex-shrink: 0;
         }
         .name {
           font-size: 22px;
