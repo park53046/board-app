@@ -11,7 +11,17 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         {/* 여기에 공통 메뉴를 만듭니다 */}
-        <nav style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <nav
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            maxWidth: "860px",
+            margin: "0 auto",
+            padding: "16px 20px 0",
+            marginBottom: "20px",
+          }}
+        >
           <Link href="/" className="nav-btn">홈</Link>
           <Link href="/about" className="nav-btn">학교 소개</Link>
           <Link href="/contact" className="nav-btn">교직원 연락처</Link>
