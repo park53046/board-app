@@ -123,7 +123,7 @@ export default function IntroPage() {
               </div>
               {/* 이름 우측 사진 — public/teacher.jpg 파일 필요 */}
               <img
-                src="/teacher.gif"
+                src="/teacher.jpg"
                 alt={`${profile.name} 교사`}
                 className="profile-photo"
               />
