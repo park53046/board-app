@@ -33,7 +33,7 @@ export default function IntroPage() {
     name: "박희정",
     nameEn: "Viki Park",
     phone: "010-3456-1376",
-    role: "AI · 정보 교사",
+    role: "AI·정보 교사",
     school: "동해삼육고등학교",
     location: "강원특별자치도 동해대로 5367",
   };
@@ -70,8 +70,8 @@ export default function IntroPage() {
   const projects = [
     
     { name: "급식 조회 앱", tag: "NEIS API", desc: "학교 급식 메뉴 조회", url: "https://script.google.com/macros/s/AKfycbyA2Tc3L12i33MVjNSYvX4BiRtaEQ71jrD7MtW0jYi-gtsZwCusPZbOOnglrqyeZkBXqQ/exec" },
-    { name: "감독배정 관리", tag: "GAS", desc: "시험·감독배정", url: "https://script.google.com/macros/s/AKfycbyD6vXQbJQVxwsNSY8ht7tuYtH0VTiSmqD1LoOl7PbpupNWHJkbxMYZ9zKsNixCghnzCg/exec" },
-    { name: "시간표 관리", tag: "GAS", desc: "시간표관리 · 수업교환", url: "https://script.google.com/macros/s/AKfycbx75CugxJ6aVV16iokCvRLlm6Gm5ei75BjLym_F8f1B2j6X1aaV_N7dNU7s8i6_M9Br/exec" },
+    { name: "감독 배정 관리", tag: "GAS", desc: "시험·감독배정", url: "https://script.google.com/macros/s/AKfycbyD6vXQbJQVxwsNSY8ht7tuYtH0VTiSmqD1LoOl7PbpupNWHJkbxMYZ9zKsNixCghnzCg/exec" },
+    { name: "시간표 관리 도구", tag: "GAS", desc: "학교 시간표관리 · 수업교환", url: "https://script.google.com/macros/s/AKfycbx75CugxJ6aVV16iokCvRLlm6Gm5ei75BjLym_F8f1B2j6X1aaV_N7dNU7s8i6_M9Br/exec" },
     { name: "바둑 교육 게임", tag: "MCTS", desc: "바둑 공략법 익히기", url: "https://script.google.com/macros/s/AKfycbxTq1Anpxg0oDz3HtTYmRTZ92rs0qAN0S-q3XTc32VEmmjqFOw7m6Fsb3VNpf0wCkDeNg/exec" },
     { name: "바둑 교육 게임", tag: "MCTS", desc: "AI 오목 경기 도구", url: "https://script.google.com/macros/s/AKfycbz73W8U-IAb_gvSOxPSACyn8wm7zoBdVelv3Iap5ajYswmYCffAwEkBe4kRY-dNUOX_/exec" },
     { name: "생활도우미 도구", tag: "MCTS", desc: "AI 최저가 물건찾기", url: "https://script.google.com/macros/s/AKfycbxnUegDQQLDAQsb4pCBVE0_ZZa_RwNOJHhXYdBUwOTqHYcx8lAr536_bnRzFwUc4Bvp/exec" },
