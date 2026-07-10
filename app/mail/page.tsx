@@ -20,6 +20,7 @@ export default function MailPage() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sent, setSent] = useState<Sent[]>([]);
+  const [loggedIn, setLoggedIn] = useState(true);
 
   const canSend = to.trim() && subject.trim();
 
@@ -27,7 +28,10 @@ export default function MailPage() {
     try {
       const r = await fetch("/api/mail", { cache: "no-store" });
       const data = await r.json();
-      if (data.ok) setSent(data.items);
+      if (data.ok) {
+        setSent(data.items);
+        setLoggedIn(data.loggedIn);
+      }
     } catch {
       /* 무시 */
     }
@@ -104,8 +108,13 @@ export default function MailPage() {
 
       {/* 보낸 기록 */}
       <div style={styles.card}>
-        <h2 style={styles.listTitle}>📋 보낸 기록 <span style={styles.count}>({sent.length})</span></h2>
-        {sent.length === 0 ? (
+        <h2 style={styles.listTitle}>📋 내가 보낸 기록 <span style={styles.count}>({sent.length})</span></h2>
+        {!loggedIn ? (
+          <p style={styles.empty}>
+            로그인하면 내가 보낸 기록이 여기에 표시돼요.{" "}
+            <Link href="/board/login" style={{ color: "#1a2b4a", fontWeight: 600 }}>로그인 →</Link>
+          </p>
+        ) : sent.length === 0 ? (
           <p style={styles.empty}>아직 보낸 기록이 없어요.</p>
         ) : (
           <div style={styles.tableWrap}>

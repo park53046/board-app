@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE "SentMail" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "studentId" TEXT,
     "senderName" TEXT,
     "toEmail" TEXT NOT NULL,
     "subject" TEXT NOT NULL,

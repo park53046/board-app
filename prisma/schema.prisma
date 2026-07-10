@@ -33,6 +33,7 @@ model User {
 // 메일 보내기 기록 (버튼 클릭 시 남는 로그)
 model SentMail {
   id         Int      @id @default(autoincrement())
+  studentId  String? // 보낸 사람 학번(로그인 시). 본인 기록만 조회하는 기준
   senderName String? // 로그인 시 이름, 아니면 비움
   toEmail    String   // 받는 사람
   subject    String   // 제목

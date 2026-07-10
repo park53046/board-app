@@ -6,13 +6,18 @@ import { prisma } from "@/lib/db";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// 보낸 기록 목록 (최근 50건)
+// 보낸 기록 목록 — 로그인한 본인 것만 (로그아웃 시 빈 목록)
 export async function GET() {
+  const session = await getSession();
+  if (!session) {
+    return Response.json({ ok: true, loggedIn: false, items: [] });
+  }
   const rows = await (prisma as any).sentMail.findMany({
+    where: { studentId: session.studentId },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
-  return Response.json({ ok: true, items: rows });
+  return Response.json({ ok: true, loggedIn: true, items: rows });
 }
 
 // 보내기 버튼 클릭 시 기록 저장
@@ -29,6 +34,7 @@ export async function POST(req: NextRequest) {
 
   const item = await (prisma as any).sentMail.create({
     data: {
+      studentId: session?.studentId ?? null,
       senderName: session?.name ?? null,
       toEmail,
       subject,
