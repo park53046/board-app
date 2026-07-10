@@ -30,6 +30,15 @@ model User {
   createdAt DateTime    @default(now())
 }
 
+// 실시간 채팅 메시지
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  studentId String   // 작성자 학번
+  name      String   // 작성자 이름
+  content   String   // 메시지 내용
+  createdAt DateTime @default(now())
+}
+
 // 학습 소감 게시글 (작성자 본인만 열람 가능)
 model BoardPost {
   id        Int      @id @default(autoincrement())
