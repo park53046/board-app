@@ -30,6 +30,16 @@ model User {
   createdAt DateTime    @default(now())
 }
 
+// 메일 보내기 기록 (버튼 클릭 시 남는 로그)
+model SentMail {
+  id         Int      @id @default(autoincrement())
+  senderName String? // 로그인 시 이름, 아니면 비움
+  toEmail    String   // 받는 사람
+  subject    String   // 제목
+  method     String   // "gmail" 또는 "outlook"
+  createdAt  DateTime @default(now())
+}
+
 // 실시간 채팅 메시지
 model ChatMessage {
   id        Int      @id @default(autoincrement())

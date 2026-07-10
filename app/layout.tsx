@@ -35,6 +35,7 @@ export default function RootLayout({
           <Link href="/intro" className="nav-btn">교사 소개</Link>
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
+          <Link href="/mail" className="nav-btn">메일</Link>
         </nav>
         <main>
           {children}
