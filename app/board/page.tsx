@@ -118,8 +118,10 @@ function AdminTable({ posts }: { posts: any[] }) {
                   </span>
                 </td>
                 <td style={styles.td}>{p.title}</td>
-                <td style={styles.td}>{new Date(p.createdAt).toLocaleDateString("ko-KR")}</td>
-                <td style={styles.td}>
+                <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
+                  {new Date(p.createdAt).toLocaleDateString("ko-KR")}
+                </td>
+                <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
                   <Link href={`/board/${p.id}`} style={styles.viewLink}>보기</Link>
                 </td>
               </tr>
@@ -157,5 +159,5 @@ const styles: Record<string, React.CSSProperties> = {
   th: { textAlign: "left", padding: "12px 14px", background: "#f1f5f9", color: "#334155", fontWeight: 700, borderBottom: "1px solid #e2e8f0", whiteSpace: "nowrap" },
   tr: { borderBottom: "1px solid #f1f5f9" },
   td: { padding: "12px 14px", color: "#1e293b", verticalAlign: "middle" },
-  viewLink: { color: "#1a2b4a", fontWeight: 600, textDecoration: "underline", fontSize: 13 },
+  viewLink: { color: "#1a2b4a", fontWeight: 700, textDecoration: "underline", fontSize: 15 },
 };
