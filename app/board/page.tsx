@@ -132,7 +132,7 @@ function AdminTable({ posts }: { posts: any[] }) {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  wrap: { maxWidth: 860, margin: "24px auto", padding: "28px 24px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,.08)", colorScheme: "light" },
+  wrap: { maxWidth: 860, margin: "48px auto", padding: "28px 24px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,.08)", colorScheme: "light" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 },
   title: { margin: "0 0 4px", fontSize: 22, fontWeight: 700, color: "#1a2b4a", display: "flex", alignItems: "center", gap: 8 },
   adminBadge: { fontSize: 12, fontWeight: 700, color: "#fff", background: "#dc2626", padding: "3px 10px", borderRadius: 20 },

@@ -130,7 +130,7 @@ export default function ChatPage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  wrap: { maxWidth: 720, margin: "24px auto", padding: "0 16px", colorScheme: "light" },
+  wrap: { maxWidth: 720, margin: "48px auto", padding: "0 16px", colorScheme: "light" },
   card: { background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,.08)", display: "flex", flexDirection: "column", height: "70vh" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: "1px solid #e2e8f0" },
   title: { margin: 0, fontSize: 18, fontWeight: 700, color: "#1a2b4a" },
