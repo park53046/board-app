@@ -56,6 +56,49 @@ textarea::placeholder {
   background-color: #aab4cc;
 }
 
+/* 드롭다운(하위 메뉴) */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.nav-drop-trigger {
+  cursor: pointer;
+  user-select: none;
+}
+/* 메뉴 바로 아래에 작은 버튼들이 세로로 나타남 */
+.nav-drop-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding-top: 8px; /* 트리거와 이어지는 투명 다리 (hover 유지) */
+  flex-direction: row;
+  gap: 6px;
+  z-index: 50;
+}
+.nav-dropdown:hover .nav-drop-menu {
+  display: flex;
+}
+/* 작은 부메뉴 버튼 */
+.nav-sub-btn {
+  display: block;
+  background-color: #f5f5dc;
+  color: #1a2b4a;
+  border: 1px solid #1a2b4a;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.15s, transform 0.1s;
+}
+.nav-sub-btn:hover {
+  background-color: #aab4cc;
+  transform: translateY(-1px);
+}
+
 .nav-btn:active {
   transform: scale(0.8);
 }

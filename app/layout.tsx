@@ -23,9 +23,15 @@ export default function RootLayout({
           }}
         >
           <Link href="/" className="nav-btn">홈</Link>
-          <Link href="/about" className="nav-btn">학교 소개</Link>
-          <Link href="/contact" className="nav-btn">교직원 연락처</Link>
-          <Link href="/about/history" className="nav-btn">학교 연혁</Link>
+
+          <div className="nav-dropdown">
+            <Link href="/about" className="nav-btn nav-drop-trigger">학교 소개 ▾</Link>
+            <div className="nav-drop-menu">
+              <Link href="/contact" className="nav-sub-btn">교직원 연락처</Link>
+              <Link href="/about/history" className="nav-sub-btn">학교 연혁</Link>
+            </div>
+          </div>
+
           <Link href="/intro" className="nav-btn">교사 소개</Link>
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
