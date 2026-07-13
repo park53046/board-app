@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { deletePostAction } from "../actions";
@@ -20,7 +20,6 @@ export default async function PostDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await getSession();
-  if (!session) redirect("/board/login");
 
   const { id } = await params;
   const postId = parseInt(id, 10);
@@ -30,11 +29,9 @@ export default async function PostDetailPage({
   const post = await (prisma as any).boardPost.findUnique({ where: { id: postId } });
   if (!post) notFound();
 
-  // 본인 글이 아니면 접근 불가 (단, 관리자는 전체 열람 가능)
-  if (post.userId !== session.userId && !session.isAdmin) redirect("/board");
-
   const deleteWithId = deletePostAction.bind(null, postId);
-  const isOwner = post.userId === session.userId;
+  // 삭제는 본인만 (로그인 안 했으면 삭제 버튼 없음)
+  const isOwner = !!session && post.userId === session.userId;
 
   return (
     <div style={styles.wrap}>

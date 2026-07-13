@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
-import { logoutAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -16,48 +14,38 @@ const SUBJECT_COLOR: Record<string, string> = {
 
 export default async function BoardPage() {
   const session = await getSession();
-  if (!session) redirect("/board/login");
 
-  // 관리자: 전체 글 + 작성자 정보 / 일반: 본인 글만
-  const posts = session.isAdmin
-    ? await (prisma as any).boardPost.findMany({
-        orderBy: { createdAt: "desc" },
-        include: { user: true },
-      })
-    : await (prisma as any).boardPost.findMany({
-        where: { userId: session.userId },
-        orderBy: { createdAt: "desc" },
-      });
+  // 로그인 없이도 전체 목록을 볼 수 있음
+  const posts = await (prisma as any).boardPost.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { user: true },
+  });
 
   return (
     <div style={styles.wrap}>
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>
-            📖 학습 소감 게시판 {session.isAdmin && <span style={styles.adminBadge}>전체 관리</span>}
+            📖 학습 소감 게시판 {session?.isAdmin && <span style={styles.adminBadge}>전체 관리</span>}
           </h1>
-          <p style={styles.welcome}>
-            안녕하세요, <strong>{session.name}</strong>님 ({session.affil})
-          </p>
+          <p style={styles.welcome}>전체 {posts.length}건</p>
         </div>
         <div style={styles.headerActions}>
-          {session.isAdmin ? (
+          {session?.isAdmin ? (
             <a href="/board/admin/export" style={styles.excelBtn}>⬇ 엑셀 다운로드</a>
-          ) : (
+          ) : session ? (
             <Link href="/board/write" style={styles.writeBtn}>+ 소감 작성</Link>
+          ) : (
+            <Link href="/board/login" style={styles.writeBtn}>로그인하고 작성</Link>
           )}
-          <form action={logoutAction}>
-            <button type="submit" style={styles.logoutBtn}>로그아웃</button>
-          </form>
         </div>
       </div>
 
-      {session.isAdmin ? (
+      {session?.isAdmin ? (
         <AdminTable posts={posts} />
       ) : posts.length === 0 ? (
         <div style={styles.empty}>
           <p>아직 작성된 소감이 없습니다.</p>
-          <Link href="/board/write" style={styles.writeBtn}>첫 소감 작성하기 →</Link>
         </div>
       ) : (
         <ul style={styles.list}>
@@ -67,6 +55,9 @@ export default async function BoardPage() {
                 <div style={styles.itemTop}>
                   <span style={{ ...styles.tag, background: SUBJECT_COLOR[post.subject] ?? "#64748b" }}>
                     {post.subject}
+                  </span>
+                  <span style={styles.author}>
+                    {post.user?.name ?? "-"} {post.user?.affil ? `(${post.user.affil})` : ""}
                   </span>
                   <span style={styles.date}>
                     {new Date(post.createdAt).toLocaleDateString("ko-KR")}
@@ -92,7 +83,6 @@ function AdminTable({ posts }: { posts: any[] }) {
   }
   return (
     <div>
-      <p style={styles.count}>전체 {posts.length}건</p>
       <div style={styles.tableWrap}>
         <table style={styles.table}>
           <thead>
@@ -142,18 +132,17 @@ const styles: Record<string, React.CSSProperties> = {
   headerActions: { display: "flex", gap: 10, alignItems: "center" },
   writeBtn: { padding: "9px 18px", background: "#1a2b4a", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, fontWeight: 600 },
   excelBtn: { padding: "9px 18px", background: "#16794a", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, fontWeight: 600 },
-  logoutBtn: { padding: "9px 14px", background: "transparent", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, color: "#475569", cursor: "pointer" },
-  empty: { textAlign: "center", padding: "60px 0", color: "#64748b", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 },
+  empty: { textAlign: "center", padding: "60px 0", color: "#64748b" },
   emptyAdmin: { textAlign: "center", padding: "40px 0", color: "#64748b" },
   list: { listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12 },
   item: { border: "1px solid #e2e8f0", borderRadius: 10, overflow: "hidden" },
   itemLink: { display: "block", padding: "16px 20px", textDecoration: "none", color: "inherit" },
-  itemTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 },
+  itemTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" },
   tag: { display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, color: "#fff" },
-  date: { fontSize: 12, color: "#64748b", marginLeft: "auto" },
+  author: { fontSize: 12, color: "#475569", fontWeight: 600 },
+  date: { fontSize: 12, color: "#94a3b8", marginLeft: "auto" },
   itemTitle: { margin: "0 0 6px", fontSize: 16, fontWeight: 600, color: "#1e293b" },
   itemPreview: { margin: 0, fontSize: 13, color: "#475569" },
-  count: { margin: "0 0 12px", fontSize: 13, color: "#475569", fontWeight: 600 },
   tableWrap: { overflowX: "auto", border: "1px solid #e2e8f0", borderRadius: 10 },
   table: { width: "100%", borderCollapse: "collapse", fontSize: 14 },
   th: { textAlign: "left", padding: "12px 14px", background: "#f1f5f9", color: "#334155", fontWeight: 700, borderBottom: "1px solid #e2e8f0", whiteSpace: "nowrap" },
