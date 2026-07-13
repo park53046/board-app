@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // 큰 파일 스트리밍 대비 (Hobby 최대 60초)
 
 // 로그인한 사람만 다운로드 — 비공개 Blob을 서버에서 받아 스트리밍
 export async function GET(req: NextRequest) {

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
         return {
           addRandomSuffix: true,
-          maximumSizeInBytes: 20 * 1024 * 1024, // 20MB 제한 (서버에서 강제)
+          maximumSizeInBytes: 100 * 1024 * 1024, // 100MB 제한 (서버에서 강제)
         };
       },
       // 참고: onUploadCompleted 는 로컬 개발에선 호출되지 않아,

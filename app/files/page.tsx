@@ -14,7 +14,7 @@ type FileItem = {
   createdAt: string;
 };
 
-const MAX = 20 * 1024 * 1024; // 20MB
+const MAX = 100 * 1024 * 1024; // 100MB
 
 function fmtSize(bytes: number) {
   if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + " MB";
@@ -60,7 +60,7 @@ export default function FilesPage() {
     setError(null);
 
     if (file.size > MAX) {
-      setError(`파일이 너무 큽니다 (${fmtSize(file.size)}). 20MB 이하만 올릴 수 있어요.`);
+      setError(`파일이 너무 큽니다 (${fmtSize(file.size)}). 100MB 이하만 올릴 수 있어요.`);
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
@@ -117,7 +117,7 @@ export default function FilesPage() {
           <Link href="/" style={styles.back}>← 홈</Link>
         </div>
 
-        <p style={styles.notice}>파일을 올리고 함께 주고받는 공간이에요. (한 파일당 최대 20MB)</p>
+        <p style={styles.notice}>파일을 올리고 함께 주고받는 공간이에요. (한 파일당 최대 100MB)</p>
 
         <div style={styles.uploadRow}>
           <label style={{ ...styles.uploadBtn, ...(uploading ? styles.uploadBtnDisabled : {}) }}>

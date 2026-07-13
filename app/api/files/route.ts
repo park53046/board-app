@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
   if (!name || !url || !pathname) {
     return Response.json({ ok: false, error: "파일 정보 누락" }, { status: 400 });
   }
-  if (size > 20 * 1024 * 1024) {
-    return Response.json({ ok: false, error: "20MB를 초과했습니다." }, { status: 400 });
+  if (size > 100 * 1024 * 1024) {
+    return Response.json({ ok: false, error: "100MB를 초과했습니다." }, { status: 400 });
   }
 
   const item = await (prisma as any).fileItem.create({
