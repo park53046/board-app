@@ -48,6 +48,7 @@ export default async function RootLayout({
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
           <Link href="/mail" className="nav-btn">메일</Link>
+          <Link href="/files" className="nav-btn">자료실</Link>
 
           {/* 로그인 상태 영역 (오른쪽) */}
           {session ? (

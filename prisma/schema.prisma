@@ -30,6 +30,18 @@ model User {
   createdAt DateTime    @default(now())
 }
 
+// 자료실 파일 (실제 파일은 Vercel Blob에 저장, 여기엔 정보만)
+model FileItem {
+  id                Int      @id @default(autoincrement())
+  name              String   // 원본 파일명
+  url               String   // Blob 다운로드 URL
+  pathname          String   // Blob 경로 (삭제용)
+  size              Int      // 파일 크기(바이트)
+  uploaderStudentId String? // 올린 사람 학번
+  uploaderName      String? // 올린 사람 이름
+  createdAt         DateTime @default(now())
+}
+
 // 메일 보내기 기록 (버튼 클릭 시 남는 로그)
 model SentMail {
   id         Int      @id @default(autoincrement())
