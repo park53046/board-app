@@ -20,12 +20,15 @@ export async function GET(req: NextRequest) {
   const item = await (prisma as any).fileItem.findUnique({ where: { id } });
   if (!item) return new Response("파일 없음", { status: 404 });
 
-  const { stream, headers } = await get(item.pathname, { access: "private" });
+  const result = await get(item.pathname, { access: "private" });
+  if (!result) {
+    return new Response("파일을 찾을 수 없습니다.", { status: 404 });
+  }
 
-  const outHeaders = new Headers(headers as any);
+  const outHeaders = new Headers(result.headers);
   outHeaders.set(
     "Content-Disposition",
     `attachment; filename*=UTF-8''${encodeURIComponent(item.name)}`
   );
-  return new Response(stream as any, { headers: outHeaders });
+  return new Response(result.stream, { headers: outHeaders });
 }
