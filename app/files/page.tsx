@@ -67,9 +67,9 @@ export default function FilesPage() {
 
     setUploading(true);
     try {
-      // 1) 브라우저 → Vercel Blob 직접 업로드
+      // 1) 브라우저 → Vercel Blob 직접 업로드 (비공개)
       const blob = await upload(file.name, file, {
-        access: "public",
+        access: "private",
         handleUploadUrl: "/api/files/upload",
       });
       // 2) DB에 파일 정보 저장
@@ -143,7 +143,7 @@ export default function FilesPage() {
                     </span>
                   </div>
                   <div style={styles.fileActions}>
-                    <a href={f.url} download={f.name} style={styles.downloadBtn}>다운로드</a>
+                    <a href={`/api/files/download?id=${f.id}`} style={styles.downloadBtn}>다운로드</a>
                     {canDelete && (
                       <button type="button" onClick={() => remove(f.id)} style={styles.deleteBtn}>삭제</button>
                     )}
