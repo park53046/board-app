@@ -30,6 +30,17 @@ model User {
   createdAt DateTime    @default(now())
 }
 
+// 대용량 링크 (구글드라이브 등 외부 링크만 저장)
+model DriveLink {
+  id                Int      @id @default(autoincrement())
+  title             String   // 자료 제목
+  url               String   // 외부 링크 (구글드라이브 등)
+  note              String? // 간단 설명(선택)
+  uploaderStudentId String?
+  uploaderName      String?
+  createdAt         DateTime @default(now())
+}
+
 // 자료실 파일 (실제 파일은 Vercel Blob에 저장, 여기엔 정보만)
 model FileItem {
   id                Int      @id @default(autoincrement())
