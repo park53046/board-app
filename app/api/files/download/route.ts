@@ -25,10 +25,16 @@ export async function GET(req: NextRequest) {
     return new Response("파일을 찾을 수 없습니다.", { status: 404 });
   }
 
-  const outHeaders = new Headers(result.headers);
-  outHeaders.set(
+  // 필요한 헤더만 직접 복사 (undici Headers를 그대로 넘기면 타입 충돌)
+  const headers = new Headers();
+  const contentType = result.headers.get("content-type");
+  if (contentType) headers.set("Content-Type", contentType);
+  const contentLength = result.headers.get("content-length");
+  if (contentLength) headers.set("Content-Length", contentLength);
+  headers.set(
     "Content-Disposition",
     `attachment; filename*=UTF-8''${encodeURIComponent(item.name)}`
   );
-  return new Response(result.stream, { headers: outHeaders });
+
+  return new Response(result.stream as any, { headers });
 }
