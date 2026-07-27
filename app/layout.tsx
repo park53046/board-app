@@ -35,20 +35,12 @@ export default async function RootLayout({
           }}
         >
           <Link href="/" className="nav-btn">홈</Link>
-
-          <div className="nav-dropdown">
-            <Link href="/about" className="nav-btn nav-drop-trigger">학교 소개 ▾</Link>
-            <div className="nav-drop-menu">
-              <Link href="/contact" className="nav-sub-btn">교직원 연락처</Link>
-              <Link href="/about/history" className="nav-sub-btn">학교 연혁</Link>
-            </div>
-          </div>
-
-          <Link href="/intro" className="nav-btn">교사 소개</Link>
+          <Link href="/intro" className="nav-btn">비키 교실</Link>
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
           <Link href="/mail" className="nav-btn">메일</Link>
           <Link href="/files" className="nav-btn">자료실</Link>
+          <Link href="/coding" className="nav-btn">코딩 교실</Link>
 
           {/* 로그인 상태 영역 (오른쪽) */}
           {session ? (
