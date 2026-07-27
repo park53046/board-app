@@ -65,7 +65,7 @@ export default async function RootLayout({
         <main>{children}</main>
 
         <footer style={{ marginTop: "20px", borderTop: "1px solid #ccc", paddingTop: "10px" }}>
-          <p style={{ textAlign: "center" }}>© 2026 동해삼육고등학교. All rights reserved.</p>
+          <p style={{ textAlign: "center" }}>© 2026 viki36.co.kr. All rights reserved.</p>
         </footer>
       </body>
     </html>
