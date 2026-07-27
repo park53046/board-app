@@ -4,10 +4,6 @@ import { getSession, clearSession } from "@/lib/session";
 
 import "./globals.css";
 
-// 쇼핑몰(Soho) 주소 — 쇼핑몰을 Vercel에 배포한 뒤, 그 주소로 바꾸세요.
-const SHOP_URL = "https://soho-shop.vercel.app";
-// ↑ 배포된 쇼핑몰 주소
-
 export default async function RootLayout({
   children,
 }: {
@@ -45,7 +41,7 @@ export default async function RootLayout({
           <Link href="/mail" className="nav-btn">메일</Link>
           <Link href="/files" className="nav-btn">자료실</Link>
           <Link href="/coding" className="nav-btn">코딩 교실</Link>
-          <a href={SHOP_URL} className="nav-btn">Soho</a>
+          <Link href="/soho" className="nav-btn">Soho</Link>
 
           {/* 로그인 상태 영역 (오른쪽) */}
           {session ? (
