@@ -35,7 +35,7 @@ export default async function RootLayout({
           }}
         >
           <Link href="/" className="nav-btn">홈</Link>
-          <Link href="/intro" className="nav-btn">비키 교실</Link>
+          <Link href="/intro" className="nav-btn">비키 AI</Link>
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
           <Link href="/mail" className="nav-btn">메일</Link>
