@@ -100,14 +100,13 @@ export async function GET() {
   const wb = new ExcelJS.Workbook();
   wb.creator = "학습 소감 게시판";
 
-  if (subjects.length === 0) {
-    // 글이 하나도 없을 때 빈 시트라도 생성
-    buildSheet(wb.addWorksheet("전체"), []);
-  } else {
-    for (const subject of subjects) {
-      const ws = wb.addWorksheet(safeSheetName(subject));
-      buildSheet(ws, groups.get(subject)!);
-    }
+  // 맨 앞에 전체 리스트를 모은 "전체" 시트
+  buildSheet(wb.addWorksheet("전체"), posts);
+
+  // 그다음 과목별 시트
+  for (const subject of subjects) {
+    const ws = wb.addWorksheet(safeSheetName(subject));
+    buildSheet(ws, groups.get(subject)!);
   }
 
   const buf = await wb.xlsx.writeBuffer();
