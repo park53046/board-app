@@ -39,7 +39,9 @@ export default function FilesPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [me, setMe] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 링크 추가 폼
@@ -82,27 +84,45 @@ export default function FilesPage() {
   }, []);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
     setError(null);
-    if (file.size > MAX) {
-      setError(`파일이 너무 큽니다 (${fmtSize(file.size)}). 100MB 이하만 올릴 수 있어요.`);
+
+    // 용량 초과 파일 걸러내기
+    const tooBig = files.filter((f) => f.size > MAX);
+    const okFiles = files.filter((f) => f.size <= MAX);
+    if (tooBig.length > 0) {
+      setError(`100MB를 넘는 파일은 제외했어요: ${tooBig.map((f) => f.name).join(", ")}`);
+    }
+    if (okFiles.length === 0) {
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
+
     setUploading(true);
+    const failed: string[] = [];
     try {
-      const blob = await upload(file.name, file, { access: "private", handleUploadUrl: "/api/files/upload" });
-      await fetch("/api/files", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: file.name, url: blob.url, pathname: blob.pathname, size: file.size }),
-      });
+      for (let i = 0; i < okFiles.length; i++) {
+        const file = okFiles[i];
+        setProgress(`${okFiles.length}개 중 ${i + 1}번째 올리는 중… (${file.name})`);
+        try {
+          const blob = await upload(file.name, file, { access: "private", handleUploadUrl: "/api/files/upload" });
+          await fetch("/api/files", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: file.name, url: blob.url, pathname: blob.pathname, size: file.size }),
+          });
+        } catch {
+          failed.push(file.name);
+        }
+      }
+      if (failed.length > 0) {
+        setError(`업로드 실패: ${failed.join(", ")}`);
+      }
       await load();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "업로드 실패");
     } finally {
       setUploading(false);
+      setProgress("");
       if (inputRef.current) inputRef.current.value = "";
     }
   }
@@ -133,10 +153,28 @@ export default function FilesPage() {
     }
   }
 
-  async function removeRow(row: Row) {
-    if (!confirm("삭제할까요?")) return;
-    const endpoint = row.kind === "file" ? "/api/files" : "/api/drive";
-    await fetch(`${endpoint}?id=${row.id}`, { method: "DELETE" });
+  function rowKey(row: Row) {
+    return `${row.kind}-${row.id}`;
+  }
+
+  function toggleOne(key: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  async function deleteSelected(deletableKeys: string[]) {
+    const targets = rows.filter((r) => selected.has(rowKey(r)) && deletableKeys.includes(rowKey(r)));
+    if (targets.length === 0) return;
+    if (!confirm(`선택한 ${targets.length}개를 삭제할까요?`)) return;
+    for (const row of targets) {
+      const endpoint = row.kind === "file" ? "/api/files" : "/api/drive";
+      await fetch(`${endpoint}?id=${row.id}`, { method: "DELETE" });
+    }
+    setSelected(new Set());
     load();
   }
 
@@ -165,8 +203,8 @@ export default function FilesPage() {
 
         <div style={styles.uploadRow}>
           <label style={{ ...styles.uploadBtn, ...(uploading ? styles.disabled : {}) }}>
-            {uploading ? "업로드 중..." : "＋ 파일 올리기"}
-            <input ref={inputRef} type="file" onChange={handleFile} disabled={uploading} style={{ display: "none" }} />
+            {uploading ? "업로드 중..." : "＋ 파일 올리기 (여러 장 가능)"}
+            <input ref={inputRef} type="file" multiple onChange={handleFile} disabled={uploading} style={{ display: "none" }} />
           </label>
           <button type="button" onClick={() => setShowLinkForm((v) => !v)} style={styles.linkBtn}>
             🔗 대용량 링크 추가
@@ -185,49 +223,90 @@ export default function FilesPage() {
           </form>
         )}
 
+        {uploading && progress && <p style={styles.progress}>{progress}</p>}
         {error && <p style={styles.error}>{error}</p>}
 
         {rows.length === 0 ? (
           <p style={styles.empty}>아직 올라온 자료가 없어요.</p>
-        ) : (
-          <ul style={styles.list}>
-            {rows.map((row) => {
-              const canDelete = isAdmin || row.uploaderStudentId === me;
-              return (
-                <li key={`${row.kind}-${row.id}`} style={styles.item}>
-                  <div style={styles.info}>
-                    {row.kind === "file" ? (
-                      <>
-                        <span style={styles.name}>📄 {row.name}</span>
-                        <span style={styles.meta}>
-                          {fmtSize(row.size)} · {row.uploaderName ?? "익명"} · {new Date(row.createdAt).toLocaleDateString("ko-KR")}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span style={styles.name}>🔗 {row.title}</span>
-                        {row.note && <span style={styles.note}>{row.note}</span>}
-                        <span style={styles.meta}>
-                          링크 · {row.uploaderName ?? "익명"} · {new Date(row.createdAt).toLocaleDateString("ko-KR")}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <div style={styles.actions}>
-                    {row.kind === "file" ? (
-                      <a href={`/api/files/download?id=${row.id}`} style={styles.downloadBtn}>다운로드</a>
-                    ) : (
-                      <a href={row.url} target="_blank" rel="noopener noreferrer" style={styles.openBtn}>열기 ↗</a>
-                    )}
-                    {canDelete && (
-                      <button type="button" onClick={() => removeRow(row)} style={styles.deleteBtn}>삭제</button>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        ) : (() => {
+          const deletableKeys = rows.filter((r) => isAdmin || r.uploaderStudentId === me).map(rowKey);
+          const selectedCount = deletableKeys.filter((k) => selected.has(k)).length;
+          const allSelected = deletableKeys.length > 0 && deletableKeys.every((k) => selected.has(k));
+          const toggleAll = () =>
+            setSelected(allSelected ? new Set() : new Set(deletableKeys));
+          return (
+            <div style={styles.tableBox}>
+              <div style={styles.listHead}>
+                <span style={styles.listCount}>전체 {rows.length}개{selectedCount > 0 ? ` · ${selectedCount}개 선택` : ""}</span>
+                <button
+                  type="button"
+                  onClick={() => deleteSelected(deletableKeys)}
+                  disabled={selectedCount === 0}
+                  style={{ ...styles.bulkDelete, ...(selectedCount === 0 ? styles.bulkDisabled : {}) }}
+                >
+                  🗑 선택 삭제
+                </button>
+              </div>
+              <div style={styles.tableWrap}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.th, width: 34, textAlign: "center" }}>
+                        {deletableKeys.length > 0 && (
+                          <input type="checkbox" checked={allSelected} onChange={toggleAll} style={styles.checkbox} />
+                        )}
+                      </th>
+                      <th style={{ ...styles.th, width: 34, textAlign: "center" }}>#</th>
+                      <th style={styles.th}>이름</th>
+                      <th style={{ ...styles.th, width: 72, textAlign: "right" }}>크기</th>
+                      <th style={{ ...styles.th, width: 70, whiteSpace: "nowrap" }}>올린이</th>
+                      <th style={{ ...styles.th, width: 92, whiteSpace: "nowrap" }}>날짜</th>
+                      <th style={{ ...styles.th, width: 64, textAlign: "center" }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row, i) => {
+                      const key = rowKey(row);
+                      const canDelete = isAdmin || row.uploaderStudentId === me;
+                      const checked = selected.has(key);
+                      return (
+                        <tr key={key} style={{ ...styles.trow, ...(checked ? styles.trowChecked : {}) }}>
+                          <td style={{ ...styles.tdc, textAlign: "center" }}>
+                            {canDelete && (
+                              <input type="checkbox" checked={checked} onChange={() => toggleOne(key)} style={styles.checkbox} />
+                            )}
+                          </td>
+                          <td style={{ ...styles.tdc, textAlign: "center", color: "#94a3b8" }}>{i + 1}</td>
+                          <td style={styles.tdc}>
+                            <span style={styles.fname}>
+                              {row.kind === "file" ? "📄" : "🔗"}{" "}
+                              {row.kind === "file" ? row.name : row.title}
+                            </span>
+                            {row.kind === "link" && row.note && <span style={styles.fnote}> — {row.note}</span>}
+                          </td>
+                          <td style={{ ...styles.tdc, textAlign: "right", color: "#64748b", whiteSpace: "nowrap" }}>
+                            {row.kind === "file" ? fmtSize(row.size) : "링크"}
+                          </td>
+                          <td style={{ ...styles.tdc, color: "#64748b", whiteSpace: "nowrap" }}>{row.uploaderName ?? "익명"}</td>
+                          <td style={{ ...styles.tdc, color: "#94a3b8", whiteSpace: "nowrap" }}>
+                            {new Date(row.createdAt).toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit" })}
+                          </td>
+                          <td style={{ ...styles.tdc, textAlign: "center" }}>
+                            {row.kind === "file" ? (
+                              <a href={`/api/files/download?id=${row.id}`} style={styles.dlMini} title="다운로드">⬇</a>
+                            ) : (
+                              <a href={row.url} target="_blank" rel="noopener noreferrer" style={styles.dlMini} title="열기">↗</a>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
@@ -249,17 +328,23 @@ const styles: Record<string, React.CSSProperties> = {
   addLinkBtn: { padding: "9px 18px", background: "#1a2b4a", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer" },
   cancelBtn: { padding: "9px 14px", background: "transparent", border: "1px solid #cbd5e1", color: "#64748b", borderRadius: 8, fontSize: 14, cursor: "pointer" },
   error: { color: "#dc2626", fontSize: 13, margin: "6px 0 0" },
+  progress: { color: "#0e7490", fontSize: 13, fontWeight: 600, margin: "6px 0 0" },
   empty: { textAlign: "center", color: "#94a3b8", padding: "40px 0", fontSize: 14 },
-  list: { listStyle: "none", margin: "18px 0 0", padding: 0, display: "flex", flexDirection: "column", gap: 10 },
-  item: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, border: "1px solid #e2e8f0", borderRadius: 10, padding: "12px 16px", flexWrap: "wrap" },
-  info: { display: "flex", flexDirection: "column", gap: 3, minWidth: 0 },
-  name: { fontSize: 15, fontWeight: 600, color: "#1e293b", wordBreak: "break-all" },
-  note: { fontSize: 13, color: "#475569" },
-  meta: { fontSize: 12, color: "#64748b" },
-  actions: { display: "flex", gap: 8, alignItems: "center" },
-  downloadBtn: { padding: "7px 16px", background: "#16794a", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600 },
-  openBtn: { padding: "7px 16px", background: "#0f6cbd", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 13, fontWeight: 600 },
-  deleteBtn: { padding: "7px 12px", background: "transparent", border: "1px solid #fca5a5", color: "#dc2626", borderRadius: 8, fontSize: 13, cursor: "pointer" },
+  tableBox: { marginTop: 18 },
+  listHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  listCount: { fontSize: 13, color: "#64748b", fontWeight: 600 },
+  bulkDelete: { padding: "6px 14px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" },
+  bulkDisabled: { background: "#e2e8f0", color: "#94a3b8", cursor: "default" },
+  tableWrap: { border: "1px solid #e2e8f0", borderRadius: 10, overflowX: "auto" },
+  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
+  th: { textAlign: "left", padding: "8px 10px", background: "#f8fafc", color: "#475569", fontWeight: 700, borderBottom: "1px solid #e2e8f0", fontSize: 12, whiteSpace: "nowrap" },
+  trow: { borderBottom: "1px solid #f1f5f9" },
+  trowChecked: { background: "#eff6ff" },
+  tdc: { padding: "7px 10px", color: "#1e293b", verticalAlign: "middle" },
+  checkbox: { width: 15, height: 15, cursor: "pointer", accentColor: "#0f6cbd" },
+  fname: { fontWeight: 600, color: "#1e293b", wordBreak: "break-all" },
+  fnote: { color: "#64748b", fontSize: 12 },
+  dlMini: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, background: "#16794a", color: "#fff", borderRadius: 6, textDecoration: "none", fontSize: 14, fontWeight: 700 },
   loginBox: { background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: 32, textAlign: "center", maxWidth: 360, margin: "40px auto" },
   loginBtn: { display: "inline-block", padding: "10px 20px", background: "#1a2b4a", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, fontWeight: 600 },
 };
