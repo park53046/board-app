@@ -242,10 +242,10 @@ export default function ChatPage() {
 const styles: Record<string, React.CSSProperties> = {
   wrap: { maxWidth: 720, margin: "48px auto", padding: "0 16px", colorScheme: "light" },
   card: { background: "#fff", border: "1px solid #efe6fb", borderRadius: 18, boxShadow: "0 10px 30px rgba(147,112,219,.18)", display: "flex", flexDirection: "column", height: "70vh", overflow: "hidden" },
-  // 상단부 — 라벤더 파스텔
-  header: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "linear-gradient(90deg,#EDE4FF 0%,#FBD9EC 100%)", borderBottom: "1px solid #ecd9f5" },
-  title: { margin: 0, fontSize: 19, fontWeight: 800, color: "#7C3AED" },
-  back: { fontSize: 13, color: "#9061c2", fontWeight: 600, textDecoration: "none" },
+  // 상단부 — 민트 파스텔
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "linear-gradient(90deg,#CFF5E7 0%,#BFEFEA 100%)", borderBottom: "1px solid #b3e6da" },
+  title: { margin: 0, fontSize: 19, fontWeight: 800, color: "#0E8F73" },
+  back: { fontSize: 13, color: "#12a186", fontWeight: 600, textDecoration: "none" },
   toolbar: { display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", background: "#fff0f5", borderBottom: "1px solid #f8d3e2" },
   cancelBtn: { padding: "6px 14px", background: "#fff", border: "1px solid #e6c9de", color: "#9061c2", borderRadius: 8, fontSize: 13, cursor: "pointer" },
   delBtn: { padding: "6px 16px", background: "#F472B6", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" },
@@ -255,10 +255,10 @@ const styles: Record<string, React.CSSProperties> = {
   row: { display: "flex" },
   sender: { fontSize: 12, color: "#8a7bb0", margin: "0 0 3px 4px", fontWeight: 700 },
   bubble: { padding: "10px 14px", borderRadius: 16, fontSize: 14, lineHeight: 1.5, wordBreak: "break-word", whiteSpace: "pre-wrap", boxShadow: "0 2px 6px rgba(120,100,170,.12)" },
-  // 내 말풍선 — 은은한 보라·핑크 그라데이션
-  bubbleMine: { background: "linear-gradient(135deg,#B79CF5 0%,#F19FD0 100%)", color: "#ffffff", borderBottomRightRadius: 5 },
-  // 상대 말풍선 — 흰색 + 파스텔 테두리
-  bubbleOther: { background: "#ffffff", color: "#4b3b6b", border: "1px solid #ecdcff", borderBottomLeftRadius: 5 },
+  // 내 말풍선 — 연파랑
+  bubbleMine: { background: "linear-gradient(135deg,#BFE0FF 0%,#A9CCF5 100%)", color: "#123a63", borderBottomRightRadius: 5 },
+  // 상대 말풍선 — 흰색 + 연파랑 테두리
+  bubbleOther: { background: "#ffffff", color: "#334155", border: "1px solid #d6e6fb", borderBottomLeftRadius: 5 },
   msgImg: { maxWidth: 240, maxHeight: 240, borderRadius: 14, border: "2px solid #fff", boxShadow: "0 4px 12px rgba(120,100,170,.2)", display: "block", cursor: "pointer", marginBottom: 4 },
   time: { fontSize: 11, color: "#b0a3cc", marginTop: 3 },
   previewBar: { display: "flex", alignItems: "center", gap: 10, padding: "8px 16px", borderTop: "1px solid #f3e6c8", background: "#FFF8E7" },
