@@ -59,6 +59,7 @@ export default async function BoardPage() {
                   <span style={styles.author}>
                     {post.user?.name ?? "-"} {post.user?.affil ? `(${post.user.affil})` : ""}
                   </span>
+                  {post.praise && <span style={styles.praise}>{post.praise} 칭찬</span>}
                   <span style={styles.date}>
                     {new Date(post.createdAt).toLocaleDateString("ko-KR")}
                   </span>
@@ -107,7 +108,7 @@ function AdminTable({ posts }: { posts: any[] }) {
                     {p.subject}
                   </span>
                 </td>
-                <td style={styles.td}>{p.title}</td>
+                <td style={styles.td}>{p.title} {p.praise && <span title="교사 칭찬">{p.praise}</span>}</td>
                 <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
                   {new Date(p.createdAt).toLocaleDateString("ko-KR")}
                 </td>
@@ -140,6 +141,7 @@ const styles: Record<string, React.CSSProperties> = {
   itemTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" },
   tag: { display: "inline-block", padding: "3px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, color: "#fff" },
   author: { fontSize: 12, color: "#4b8a80", fontWeight: 700 },
+  praise: { fontSize: 12, fontWeight: 700, color: "#b45309", background: "#FEF3C7", border: "1px solid #fcd34d", padding: "1px 8px", borderRadius: 20 },
   date: { fontSize: 12, color: "#9bb7c4", marginLeft: "auto" },
   itemTitle: { margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: "#15495c" },
   itemPreview: { margin: 0, fontSize: 13, color: "#5a7d86" },

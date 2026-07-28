@@ -15,6 +15,43 @@ export type ActionState =
 
 const SUBJECTS = ["인공지능", "프로그래밍", "컴퓨터그래픽", "데이터과학"];
 
+// 허용된 칭찬 스탬프
+const PRAISE_STAMPS = ["⭐", "👍", "💯", "🌟", "❤️"];
+
+// ── 교사 댓글 달기 (관리자만) ──
+export async function addCommentAction(postId: number, formData: FormData): Promise<void> {
+  const session = await getSession();
+  if (!session?.isAdmin) return;
+  const content = String(formData.get("content") ?? "").trim();
+  if (!content) return;
+  await (prisma as any).comment.create({
+    data: { postId, authorName: session.name, content },
+  });
+  revalidatePath(`/board/${postId}`);
+}
+
+// ── 댓글 삭제 (관리자만) ──
+export async function deleteCommentAction(commentId: number, postId: number): Promise<void> {
+  const session = await getSession();
+  if (!session?.isAdmin) return;
+  await (prisma as any).comment.deleteMany({ where: { id: commentId } });
+  revalidatePath(`/board/${postId}`);
+}
+
+// ── 칭찬 스탬프 찍기/취소 (관리자만) ──
+export async function setPraiseAction(postId: number, stamp: string): Promise<void> {
+  const session = await getSession();
+  if (!session?.isAdmin) return;
+  // 빈 값이면 취소, 아니면 허용된 스탬프만
+  const value = stamp && PRAISE_STAMPS.includes(stamp) ? stamp : null;
+  await (prisma as any).boardPost.update({
+    where: { id: postId },
+    data: { praise: value },
+  });
+  revalidatePath(`/board/${postId}`);
+  revalidatePath(`/board`);
+}
+
 // 회원가입
 export async function registerAction(
   _prev: ActionState,
