@@ -21,6 +21,15 @@ export default async function BoardPage() {
     include: { user: true },
   });
 
+  // 교사 댓글을 글별로 묶기 (목록에 최신 코멘트 표시용)
+  const allComments = await (prisma as any).comment.findMany({ orderBy: { createdAt: "asc" } });
+  const commentMap = new Map<number, any[]>();
+  for (const c of allComments) {
+    const arr = commentMap.get(c.postId) ?? [];
+    arr.push(c);
+    commentMap.set(c.postId, arr);
+  }
+
   return (
     <div style={styles.wrap}>
       <div style={styles.header}>
@@ -68,6 +77,20 @@ export default async function BoardPage() {
                 <p style={styles.itemPreview}>
                   {String(post.content).slice(0, 60)}{String(post.content).length > 60 ? "…" : ""}
                 </p>
+                {(() => {
+                  const cs = commentMap.get(post.id) ?? [];
+                  if (cs.length === 0) return null;
+                  const last = cs[cs.length - 1];
+                  return (
+                    <div style={styles.commentPeek}>
+                      <span style={styles.commentPeekBadge}>💬 교사 {last.authorName}</span>
+                      <span style={styles.commentPeekText}>
+                        {String(last.content).slice(0, 50)}{String(last.content).length > 50 ? "…" : ""}
+                        {cs.length > 1 ? `  (외 ${cs.length - 1})` : ""}
+                      </span>
+                    </div>
+                  );
+                })()}
               </Link>
             </li>
           ))}
@@ -145,6 +168,9 @@ const styles: Record<string, React.CSSProperties> = {
   date: { fontSize: 12, color: "#9bb7c4", marginLeft: "auto" },
   itemTitle: { margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: "#15495c" },
   itemPreview: { margin: 0, fontSize: 13, color: "#5a7d86" },
+  commentPeek: { display: "flex", alignItems: "center", gap: 8, marginTop: 10, padding: "8px 12px", background: "#ECFEFF", border: "1px solid #cfeff5", borderRadius: 10, flexWrap: "wrap" },
+  commentPeekBadge: { fontSize: 11, fontWeight: 700, color: "#fff", background: "#0891b2", padding: "2px 8px", borderRadius: 20, whiteSpace: "nowrap" },
+  commentPeekText: { fontSize: 12.5, color: "#155e6b", flex: 1, minWidth: 0 },
   tableWrap: { overflowX: "auto", border: "1px solid #d7eef2", borderRadius: 12, background: "#fff" },
   table: { width: "100%", borderCollapse: "collapse", fontSize: 14 },
   th: { textAlign: "left", padding: "12px 14px", background: "linear-gradient(90deg,#CFF5E7,#D3F0FA)", color: "#0E8F73", fontWeight: 800, borderBottom: "1px solid #c7ebe0", whiteSpace: "nowrap" },
