@@ -31,14 +31,17 @@ export async function POST(req: NextRequest) {
   }
   const body = await req.json().catch(() => ({}));
   const text = String(body?.content ?? "").trim();
-  if (!text) {
+  const imagePath = body?.imagePath ? String(body.imagePath) : null;
+
+  // 글도 이미지도 없으면 거부
+  if (!text && !imagePath) {
     return Response.json({ ok: false, error: "내용을 입력하세요." }, { status: 400 });
   }
   if (text.length > 500) {
     return Response.json({ ok: false, error: "500자 이하로 입력하세요." }, { status: 400 });
   }
   const message = await (prisma as any).chatMessage.create({
-    data: { studentId: session.studentId, name: session.name, content: text },
+    data: { studentId: session.studentId, name: session.name, content: text, imagePath },
   });
   return Response.json({ ok: true, message });
 }

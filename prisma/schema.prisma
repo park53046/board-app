@@ -69,7 +69,8 @@ model ChatMessage {
   id        Int      @id @default(autoincrement())
   studentId String   // 작성자 학번
   name      String   // 작성자 이름
-  content   String   // 메시지 내용
+  content   String   // 메시지 내용 (이미지만 보낼 땐 빈 문자열)
+  imagePath String? // 첨부 이미지의 Blob 경로 (있으면 그림 표시)
   createdAt DateTime @default(now())
 }
 
