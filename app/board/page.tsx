@@ -51,7 +51,7 @@ export default async function BoardPage() {
       </div>
 
       {session?.isAdmin ? (
-        <AdminTable posts={posts} />
+        <AdminTable posts={posts} commentMap={commentMap} />
       ) : posts.length === 0 ? (
         <div style={styles.empty}>
           <p>아직 작성된 소감이 없습니다.</p>
@@ -101,7 +101,7 @@ export default async function BoardPage() {
 }
 
 // ── 관리자 전용 전체 리스트(작성자 표시) ──────────────────────
-function AdminTable({ posts }: { posts: any[] }) {
+function AdminTable({ posts, commentMap }: { posts: any[]; commentMap: Map<number, any[]> }) {
   if (posts.length === 0) {
     return <p style={styles.emptyAdmin}>아직 작성된 소감이 없습니다.</p>;
   }
@@ -116,30 +116,46 @@ function AdminTable({ posts }: { posts: any[] }) {
               <th style={styles.th}>성명</th>
               <th style={styles.th}>과목</th>
               <th style={styles.th}>제목</th>
+              <th style={styles.th}>교사 코멘트</th>
               <th style={styles.th}>작성일</th>
-              <th style={styles.th}></th>
             </tr>
           </thead>
           <tbody>
-            {posts.map((p) => (
-              <tr key={p.id} style={styles.tr}>
-                <td style={styles.td}>{p.user?.affil ?? "-"}</td>
-                <td style={styles.td}>{p.user?.studentId ?? "-"}</td>
-                <td style={styles.td}>{p.user?.name ?? "-"}</td>
-                <td style={styles.td}>
-                  <span style={{ ...styles.tag, background: SUBJECT_COLOR[p.subject] ?? "#64748b" }}>
-                    {p.subject}
-                  </span>
-                </td>
-                <td style={styles.td}>{p.title} {p.praise && <span title="교사 칭찬">{p.praise}</span>}</td>
-                <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
-                  {new Date(p.createdAt).toLocaleDateString("ko-KR")}
-                </td>
-                <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
-                  <Link href={`/board/${p.id}`} style={styles.viewLink}>보기</Link>
-                </td>
-              </tr>
-            ))}
+            {posts.map((p) => {
+              const cs = commentMap.get(p.id) ?? [];
+              const last = cs[cs.length - 1];
+              return (
+                <tr key={p.id} style={styles.tr}>
+                  <td style={styles.td}>{p.user?.affil ?? "-"}</td>
+                  <td style={styles.td}>{p.user?.studentId ?? "-"}</td>
+                  <td style={styles.td}>{p.user?.name ?? "-"}</td>
+                  <td style={styles.td}>
+                    <span style={{ ...styles.tag, background: SUBJECT_COLOR[p.subject] ?? "#64748b" }}>
+                      {p.subject}
+                    </span>
+                  </td>
+                  <td style={styles.td}>
+                    <Link href={`/board/${p.id}`} style={styles.titleLink}>
+                      {p.title}
+                    </Link>{" "}
+                    {p.praise && <span title="교사 칭찬">{p.praise}</span>}
+                  </td>
+                  <td style={styles.td}>
+                    {last ? (
+                      <span style={styles.commentCell}>
+                        💬 {String(last.content).slice(0, 24)}{String(last.content).length > 24 ? "…" : ""}
+                        {cs.length > 1 ? ` (외 ${cs.length - 1})` : ""}
+                      </span>
+                    ) : (
+                      <span style={styles.commentEmpty}>—</span>
+                    )}
+                  </td>
+                  <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
+                    {new Date(p.createdAt).toLocaleDateString("ko-KR")}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -177,4 +193,7 @@ const styles: Record<string, React.CSSProperties> = {
   tr: { borderBottom: "1px solid #eef7f4" },
   td: { padding: "12px 14px", color: "#1e293b", verticalAlign: "middle" },
   viewLink: { color: "#0E8F73", fontWeight: 800, textDecoration: "underline", fontSize: 15 },
+  titleLink: { color: "#15495c", fontWeight: 700, textDecoration: "none", borderBottom: "1px solid #b8dfe6" },
+  commentCell: { fontSize: 12.5, color: "#0e7490", fontWeight: 600, background: "#ECFEFF", border: "1px solid #cfeff5", padding: "3px 8px", borderRadius: 8, display: "inline-block" },
+  commentEmpty: { color: "#c3d6dd" },
 };
