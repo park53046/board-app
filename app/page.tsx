@@ -13,7 +13,7 @@ export default function Home() {
         </h1>
 
         <Image
-          src="/hero-ai-lab.jpg"
+          src="/home-hero-v2.jpg"
           alt="미래형 AI 컴퓨터실"
           width={1600}
           height={900}
