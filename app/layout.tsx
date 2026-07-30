@@ -51,13 +51,13 @@ export default async function RootLayout({
                 {session.name}님{session.isAdmin ? " (관리자)" : ""}
               </span>
               <form action={logout}>
-                <button type="submit" className="nav-btn" style={{ cursor: "pointer", fontFamily: "inherit" }}>
+                <button type="submit" className="nav-cta">
                   로그아웃
                 </button>
               </form>
             </div>
           ) : (
-            <Link href="/board/login" className="nav-btn" style={{ marginLeft: "auto" }}>
+            <Link href="/board/login" className="nav-cta" style={{ marginLeft: "auto" }}>
               로그인
             </Link>
           )}
