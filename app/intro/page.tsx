@@ -12,6 +12,25 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { addNoticeAction } from "./actions";
 
+// 프로젝트 설명 키워드로 아이콘(이모지) 자동 지정
+function projectIcon(text: string): string {
+  const t = text;
+  if (t.includes("급식")) return "🍱";
+  if (t.includes("감독") || t.includes("시험")) return "📝";
+  if (t.includes("시간표")) return "🗓️";
+  if (t.includes("바둑")) return "⚫";
+  if (t.includes("오목")) return "⚪";
+  if (t.includes("윷")) return "🎲";
+  if (t.includes("사다리")) return "🪜";
+  if (t.includes("최저가") || t.includes("물건") || t.includes("쇼핑")) return "🛒";
+  if (t.includes("도서")) return "📚";
+  if (t.includes("날씨") || t.includes("일기") || t.includes("예보")) return "🌤️";
+  if (t.includes("미세먼지")) return "🌫️";
+  if (t.includes("피자") || t.includes("레시피") || t.includes("음식") || t.includes("영양") || t.includes("식단") || t.includes("다이어트")) return "🍽️";
+  if (t.includes("게임")) return "🎮";
+  return "🤖";
+}
+
 export default function IntroPage() {
   // 타이핑 효과용 상태
   const [typed, setTyped] = useState("");
@@ -215,9 +234,9 @@ export default function IntroPage() {
               {projects.map((p, idx) => {
                 const inner = (
                   <>
-                    <span className="card-tag">{p.tag}</span>
-                    <h3 className="card-name">{p.name}</h3>
-                    <p className="card-desc">{p.desc}</p>
+                    <div className="card-icon">{projectIcon(p.desc + p.name)}</div>
+                    <p className="card-sub">{p.tag}</p>
+                    <h3 className="card-name">{p.desc}</h3>
                   </>
                 );
 
@@ -497,49 +516,55 @@ export default function IntroPage() {
         }
         .grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 14px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 18px;
         }
         .card {
-          background: linear-gradient(160deg, #e6eefb, #eff4fd);
-          border: 1px solid #cddbef;
-          border-radius: 10px;
-          padding: 16px;
-          transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+          background: #ffffff;
+          border: 1px solid #e3ecf7;
+          border-radius: 18px;
+          padding: 26px 20px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          box-shadow: 0 6px 18px rgba(80, 120, 200, 0.08);
+          transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
         }
         .card:hover {
-          transform: translateY(-3px);
-          border-color: #6366f1;
+          transform: translateY(-4px);
+          border-color: #93c5fd;
+          box-shadow: 0 12px 28px rgba(99, 150, 240, 0.20);
         }
-        .card-tag {
-          display: inline-block;
-          font-size: 11px;
-          color: #059669;
-          background: #d1fae5;
-          padding: 2px 8px;
-          border-radius: 6px;
-          margin-bottom: 8px;
+        .card-icon {
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 32px;
+          line-height: 1;
+          border-radius: 16px;
+          background: linear-gradient(160deg, #eef4ff, #e7fbf3);
+          margin-bottom: 14px;
+        }
+        .card-sub {
+          font-size: 12.5px;
+          color: #94a3b8;
+          margin: 0 0 4px;
+          font-weight: 600;
         }
         .card-name {
-          font-size: 15px;
+          font-size: 16px;
+          font-weight: 700;
           color: #1e293b;
-          margin: 0 0 6px;
-        }
-        .card-desc {
-          font-size: 13px;
-          color: #64748b;
           margin: 0;
+          line-height: 1.4;
         }
         .card-link {
-          display: block;
           text-decoration: none;
           color: inherit;
           cursor: pointer;
-        }
-        .card-link:hover {
-          transform: translateY(-3px);
-          border-color: #6366f1;
-          box-shadow: 0 8px 22px rgba(99, 102, 241, 0.18);
         }
         .foot {
           margin-top: 36px;
