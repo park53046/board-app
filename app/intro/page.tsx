@@ -255,7 +255,7 @@ export default function IntroPage() {
       <style jsx>{`
         .page {
           min-height: 100vh;
-          background: #0d1117;
+          background: transparent;
           display: flex;
           justify-content: center;
           padding: 32px 16px;
@@ -265,19 +265,20 @@ export default function IntroPage() {
         .window {
           width: 100%;
           max-width: 760px;
-          background: #161b22;
-          border: 1px solid #30363d;
-          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(6px);
+          border: 1px solid #dbe6f2;
+          border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 20px 50px rgba(80, 120, 200, 0.18);
         }
         .titlebar {
           display: flex;
           align-items: center;
           gap: 8px;
           padding: 12px 16px;
-          background: #21262d;
-          border-bottom: 1px solid #30363d;
+          background: linear-gradient(90deg, #eaf3ff, #e7faf1);
+          border-bottom: 1px solid #e2ecf5;
         }
         .dot {
           width: 12px;
@@ -296,27 +297,27 @@ export default function IntroPage() {
         }
         .filename {
           margin-left: 8px;
-          color: #8b949e;
+          color: #64748b;
           font-size: 13px;
         }
         .titlebar-text {
           margin-left: 12px;
-          color: #58a6ff;
+          color: #4f46e5;
           font-size: 14px;
           font-weight: 700;
         }
         .body {
           padding: 28px 28px 36px;
-          color: #c9d1d9;
+          color: #334155;
           line-height: 1.7;
         }
         .prompt {
-          color: #58a6ff;
+          color: #4f46e5;
           font-size: 14px;
           margin: 0 0 8px;
         }
         .caret {
-          color: #3fb950;
+          color: #059669;
           margin-right: 8px;
         }
         .hero {
@@ -324,13 +325,13 @@ export default function IntroPage() {
         }
         .typed {
           font-size: clamp(20px, 4vw, 28px);
-          color: #f0f6fc;
-          font-weight: 600;
+          color: #1e293b;
+          font-weight: 700;
           margin: 0 0 24px;
           min-height: 1.4em;
         }
         .cursor {
-          color: #58a6ff;
+          color: #4f46e5;
           animation: blink 1s step-end infinite;
         }
         @keyframes blink {
@@ -339,7 +340,7 @@ export default function IntroPage() {
           }
         }
         .namecard {
-          border-left: 3px solid #58a6ff;
+          border-left: 3px solid #6366f1;
           padding-left: 16px;
           display: flex;
           align-items: center;
@@ -356,38 +357,39 @@ export default function IntroPage() {
           width: 130px;
           height: auto;
           border-radius: 10px;
-          border: 1px solid #30363d;
+          border: 1px solid #dbe6f2;
           background: #fff;
           object-fit: cover;
           flex-shrink: 0;
+          box-shadow: 0 6px 16px rgba(80, 120, 200, 0.15);
         }
         .name {
           font-size: 22px;
-          color: #f0f6fc;
+          color: #1e293b;
           margin: 0 0 4px;
         }
         .name-en {
-          color: #8b949e;
+          color: #64748b;
           font-size: 16px;
           font-weight: 400;
         }
         .phone {
           font-size: 22px;
-          color: #f0f6fc;
+          color: #1e293b;
           margin: 0 0 4px;
         }
         .phone-en {
-          color: #8b949e;
+          color: #64748b;
           font-size: 16px;
           font-weight: 400;
-        }  
+        }
         .role {
-          color: #d2a8ff;
+          color: #7c3aed;
           margin: 0 0 4px;
           font-size: 15px;
         }
         .meta {
-          color: #8b949e;
+          color: #64748b;
           font-size: 13px;
           margin: 0;
         }
@@ -395,12 +397,12 @@ export default function IntroPage() {
           margin-bottom: 32px;
         }
         .comment {
-          color: #6e7681;
+          color: #94a3b8;
           font-size: 13px;
           margin: 0 0 12px;
         }
         .text {
-          color: #c9d1d9;
+          color: #334155;
           font-size: 15px;
           margin: 0;
         }
@@ -419,11 +421,11 @@ export default function IntroPage() {
         .notice-input,
         .notice-textarea {
           width: 100%;
-          background: #0d1117;
-          border: 1px solid #30363d;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
           border-radius: 8px;
           padding: 10px 12px;
-          color: #c9d1d9;
+          color: #111827;
           font-family: inherit;
           font-size: 14px;
           resize: vertical;
@@ -432,26 +434,28 @@ export default function IntroPage() {
         .notice-input:focus,
         .notice-textarea:focus {
           outline: none;
-          border-color: #58a6ff;
+          border-color: #6366f1;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
         .notice-submit {
           align-self: flex-start;
-          background: #1f6feb;
-          color: #f0f6fc;
+          background: linear-gradient(135deg, #6366f1, #38bdf8);
+          color: #ffffff;
           border: none;
           border-radius: 8px;
           padding: 9px 18px;
           font-size: 14px;
+          font-weight: 700;
           font-family: inherit;
           cursor: pointer;
-          transition: background 0.15s;
+          transition: filter 0.15s;
         }
         .notice-submit:hover {
-          background: #388bfd;
+          filter: brightness(1.08);
         }
         .notice-submit:disabled {
-          background: #21262d;
-          color: #6e7681;
+          background: #e2e8f0;
+          color: #94a3b8;
           cursor: default;
         }
         .notice-msg {
@@ -459,10 +463,10 @@ export default function IntroPage() {
           font-size: 13px;
         }
         .notice-success {
-          color: #3fb950;
+          color: #059669;
         }
         .notice-error {
-          color: #f85149;
+          color: #dc2626;
         }
         .skills {
           display: flex;
@@ -474,20 +478,20 @@ export default function IntroPage() {
           justify-content: space-between;
           font-size: 14px;
           margin-bottom: 6px;
-          color: #c9d1d9;
+          color: #334155;
         }
         .pct {
-          color: #6e7681;
+          color: #94a3b8;
         }
         .bar {
           height: 8px;
-          background: #21262d;
+          background: #e2e8f0;
           border-radius: 4px;
           overflow: hidden;
         }
         .fill {
           height: 100%;
-          background: linear-gradient(90deg, #1f6feb, #58a6ff);
+          background: linear-gradient(90deg, #6366f1, #38bdf8);
           border-radius: 4px;
           transition: width 1s ease;
         }
@@ -497,33 +501,33 @@ export default function IntroPage() {
           gap: 14px;
         }
         .card {
-          background: #0d1117;
-          border: 1px solid #30363d;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 16px;
           transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
         }
         .card:hover {
           transform: translateY(-3px);
-          border-color: #58a6ff;
+          border-color: #6366f1;
         }
         .card-tag {
           display: inline-block;
           font-size: 11px;
-          color: #3fb950;
-          background: #3fb95022;
+          color: #059669;
+          background: #d1fae5;
           padding: 2px 8px;
           border-radius: 6px;
           margin-bottom: 8px;
         }
         .card-name {
           font-size: 15px;
-          color: #f0f6fc;
+          color: #1e293b;
           margin: 0 0 6px;
         }
         .card-desc {
           font-size: 13px;
-          color: #8b949e;
+          color: #64748b;
           margin: 0;
         }
         .card-link {
@@ -534,13 +538,13 @@ export default function IntroPage() {
         }
         .card-link:hover {
           transform: translateY(-3px);
-          border-color: #58a6ff;
-          box-shadow: 0 6px 20px rgba(88, 166, 255, 0.15);
+          border-color: #6366f1;
+          box-shadow: 0 8px 22px rgba(99, 102, 241, 0.18);
         }
         .foot {
           margin-top: 36px;
           padding-top: 20px;
-          border-top: 1px solid #30363d;
+          border-top: 1px solid #e2e8f0;
         }
         @media (prefers-reduced-motion: reduce) {
           .cursor,

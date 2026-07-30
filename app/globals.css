@@ -123,13 +123,13 @@ textarea::placeholder {
 /* 담당 과목 버튼 */
 .subject-btn {
   display: inline-block;
-  background: #1f6feb22;
-  color: #58a6ff;
-  border: 1px solid #1f6feb55;
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
   padding: 8px 18px;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s, transform 0.1s,
@@ -137,13 +137,13 @@ textarea::placeholder {
 }
 
 .subject-btn:hover {
-  background: #1f6feb44;
-  border-color: #58a6ff;
+  background: #e0e7ff;
+  border-color: #6366f1;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(88, 166, 255, 0.25);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.22);
 }
 
 .subject-btn:active {
   transform: scale(0.92);
-  background: #1f6feb66;
+  background: #c7d2fe;
 }

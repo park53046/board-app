@@ -4,12 +4,12 @@ export default function Home() {
   return (
     <div className="max-w-5xl mx-auto px-4">
       <h1 className="mt-6 text-xl font-bold text-slate-800 bg-white/70 px-8 py-6 rounded-2xl shadow">
-        동해삼육 VIKI샘의 코딩 교실에 오신 것을 환영합니다.
+        VIKI샘의 코딩 교실에 오신 것을 환영합니다.
       </h1>
 
       <div className="py-8">
         <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-600 tracking-tight mb-6">
-          WELCOME TO DONGHAE SAHMYOOK VIKI ROOM..!
+          WELCOME TO VIKI Coding-ROOM..!
         </h1>
 
         <Image
