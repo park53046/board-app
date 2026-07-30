@@ -7,10 +7,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useActionState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { addNoticeAction } from "./actions";
 
 // 프로젝트 설명 키워드로 아이콘(이모지) 자동 지정
 function projectIcon(text: string): string {
@@ -67,27 +65,6 @@ export default function IntroPage() {
     { name: "데이터과학", slug: "data-science" },
   ];
 
-  // 공지사항 작성 폼
-  const [noticeState, noticeFormAction, isNoticePending] = useActionState(
-    addNoticeAction,
-    null
-  );
-  const noticeFormRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (noticeState?.ok) {
-      noticeFormRef.current?.reset();
-    }
-  }, [noticeState]);
-
-  const skills = [
-    { label: "Python", level: 90 },
-    { label: "Google Apps Script", level: 95 },
-    { label: "머신러닝 / CNN", level: 80 },
-    { label: "Next.js / 웹", level: 70 },
-    { label: "Illustrator", level: 75 },
-  ];
-
   // url 이 채워진 항목만 클릭 시 새 창으로 열립니다. (빈 "" 은 일반 카드)
   const projects = [
     
@@ -106,9 +83,9 @@ export default function IntroPage() {
     { name: "AI 도서 시스템", tag: "MCTS", desc: "도서대출 관리시스템", url: "https://script.google.com/macros/s/AKfycbyHHGCgus0mHMBaUsFHFk3ITNxkGUddFFyn7yyd1Eq64PoSxQSg7TrvCjX9lUh4mkA4zg/exec" },
     { name: "AI 일기 예보 시스템", tag: "MCTS", desc: "일기예보 주간 날씨 예보", url: "https://script.google.com/macros/s/AKfycbwyJ8qBbJQBwceUQ4ednE12aEbEs5y5prE5MzoVgclc6QfHGY_lIDhr7kgq9mKV2w8_/exec" },
     { name: "AI 미세먼지 분석 시스템", tag: "MCTS", desc: "지역별 미세먼지 분석예측", url: "https://script.google.com/macros/s/AKfycbzrMs7q-Kp-Jkpfua3G1lIiYWx_OyzwOd3QAapI9v-ujBnASu3EWPjKwJSj3zwYuOkF6Q/exec"},
-    { name: "AI 여행 추천", tag: "MCTS", desc: "맞춤형 여행 추천하기", url: "" },
-    { name: "AI 영화 추천", tag: "MCTS", desc: "영화(Movie) 추천하기", url: "" },
-    { name: "AI 직업 찾기", tag: "MCTS", desc: "MBTI 관련 직업찾기", url: "" }
+    { name: "AI 여행 추천", tag: "MCTS", desc: "맞춤형 수학여행 추천하기", url: "https://script.google.com/macros/s/AKfycbwthEa7goNJi6hUGOJPLo8ZRt6-41P_giUNT0MPmoNdr6Nt850Nn2zJ68DjoQMLeqbNSQ/exec" },
+    { name: "AI 영화 추천", tag: "MCTS", desc: "영화(Movie) 추천하기", url: "https://script.google.com/macros/s/AKfycby8VyUUAu9rAdK-cZIpOI68x4bfMAZSBpQgRwYJQd2Ylrizi3qFr8VijF4QWXSCtZVN7Q/exec" },
+    { name: "AI 직업 찾기", tag: "MCTS", desc: "MBTI 미래 직업찾기", url: "https://script.google.com/macros/s/AKfycbz7YY0DvUzVJoSBxScZ5sTpPaWfqPMzvd3NKTS7eLtFFjXpdYJj-xJ5qUkD42300mo1gQ/exec" }
   ];
 
   return (
@@ -175,64 +152,6 @@ export default function IntroPage() {
             </div>
           </section>
 
-          {/* 공지사항 작성 */}
-          <section className="block">
-            <p className="comment">{"// 공지사항 작성 — 과목을 선택하고 등록하면 해당 과목 페이지에 바로 표시됩니다"}</p>
-            <form ref={noticeFormRef} action={noticeFormAction} className="notice-form">
-              <select name="slug" defaultValue="" required className="notice-select">
-                <option value="" disabled>
-                  과목 선택
-                </option>
-                {teaches.map((t) => (
-                  <option key={t.slug} value={t.slug}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                name="title"
-                type="text"
-                placeholder="제목"
-                required
-                className="notice-input"
-              />
-              <textarea
-                name="content"
-                placeholder="내용"
-                required
-                rows={4}
-                className="notice-textarea"
-              />
-              <button type="submit" disabled={isNoticePending} className="notice-submit">
-                {isNoticePending ? "등록 중..." : "공지 등록"}
-              </button>
-            </form>
-            {noticeState?.ok === true && (
-              <p className="notice-msg notice-success">✓ 등록되었습니다.</p>
-            )}
-            {noticeState?.ok === false && (
-              <p className="notice-msg notice-error">{noticeState.error}</p>
-            )}
-          </section>
-
-          {/* 기술 스택 */}
-          <section className="block">
-            <p className="comment">{"// 기술 스택"}</p>
-            <div className="skills">
-              {skills.map((s) => (
-                <div key={s.label} className="skill">
-                  <div className="skill-top">
-                    <span>{s.label}</span>
-                    <span className="pct">{s.level}%</span>
-                  </div>
-                  <div className="bar">
-                    <div className="fill" style={{ width: `${s.level}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* 프로젝트 */}
           <section className="block">
             <p className="comment">{"// 만든 것들 (클릭하면 새 창에서 열립니다)"}</p>
@@ -290,20 +209,20 @@ export default function IntroPage() {
         .window {
           width: 100%;
           max-width: 760px;
-          background: linear-gradient(165deg, #b3b9c4, #c3c9d2);
+          background: linear-gradient(165deg, #ffffff, #f1fbf6);
           backdrop-filter: blur(6px);
-          border: 1px solid #a1a8b4;
+          border: 1px solid #cfeee0;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 20px 50px rgba(35, 45, 65, 0.26);
+          box-shadow: 0 20px 50px rgba(20, 150, 120, 0.16);
         }
         .titlebar {
           display: flex;
           align-items: center;
           gap: 8px;
           padding: 12px 16px;
-          background: linear-gradient(90deg, #a9b0bc, #b8bfca);
-          border-bottom: 1px solid #9aa2af;
+          background: linear-gradient(90deg, #dcf6ec, #eafaf3);
+          border-bottom: 1px solid #cfeee0;
         }
         .dot {
           width: 12px;
@@ -327,7 +246,7 @@ export default function IntroPage() {
         }
         .titlebar-text {
           margin-left: 12px;
-          color: #4f46e5;
+          color: #0d9488;
           font-size: 14px;
           font-weight: 700;
         }
@@ -337,12 +256,12 @@ export default function IntroPage() {
           line-height: 1.7;
         }
         .prompt {
-          color: #4f46e5;
+          color: #0d9488;
           font-size: 14px;
           margin: 0 0 8px;
         }
         .caret {
-          color: #059669;
+          color: #10b981;
           margin-right: 8px;
         }
         .hero {
@@ -356,7 +275,7 @@ export default function IntroPage() {
           min-height: 1.4em;
         }
         .cursor {
-          color: #4f46e5;
+          color: #10b981;
           animation: blink 1s step-end infinite;
         }
         @keyframes blink {
@@ -365,7 +284,7 @@ export default function IntroPage() {
           }
         }
         .namecard {
-          border-left: 3px solid #6366f1;
+          border-left: 3px solid #14b8a6;
           padding-left: 16px;
           display: flex;
           align-items: center;
@@ -409,9 +328,10 @@ export default function IntroPage() {
           font-weight: 400;
         }
         .role {
-          color: #7c3aed;
+          color: #0d9488;
           margin: 0 0 4px;
           font-size: 15px;
+          font-weight: 600;
         }
         .meta {
           color: #64748b;
@@ -527,7 +447,7 @@ export default function IntroPage() {
         }
         .card {
           background: #ffffff;
-          border: 1px solid #e3ecf7;
+          border: 1px solid #d8efe6;
           border-radius: 18px;
           padding: 26px 20px;
           text-align: center;
@@ -539,8 +459,8 @@ export default function IntroPage() {
         }
         .card:hover {
           transform: translateY(-4px);
-          border-color: #93c5fd;
-          box-shadow: 0 12px 28px rgba(99, 150, 240, 0.20);
+          border-color: #5eead4;
+          box-shadow: 0 12px 28px rgba(20, 184, 166, 0.20);
         }
         .card-icon {
           width: 60px;
@@ -551,7 +471,7 @@ export default function IntroPage() {
           font-size: 32px;
           line-height: 1;
           border-radius: 16px;
-          background: linear-gradient(160deg, #eef4ff, #e7fbf3);
+          background: linear-gradient(160deg, #dbf7ee, #eafaf4);
           margin-bottom: 14px;
         }
         .card-sub {
