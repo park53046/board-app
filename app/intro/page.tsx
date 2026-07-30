@@ -265,20 +265,20 @@ export default function IntroPage() {
         .window {
           width: 100%;
           max-width: 760px;
-          background: linear-gradient(165deg, #cbd0d8, #d8dce2);
+          background: linear-gradient(165deg, #b3b9c4, #c3c9d2);
           backdrop-filter: blur(6px);
-          border: 1px solid #b3b9c4;
+          border: 1px solid #a1a8b4;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 20px 50px rgba(40, 50, 70, 0.22);
+          box-shadow: 0 20px 50px rgba(35, 45, 65, 0.26);
         }
         .titlebar {
           display: flex;
           align-items: center;
           gap: 8px;
           padding: 12px 16px;
-          background: linear-gradient(90deg, #bcc2cc, #cad0d8);
-          border-bottom: 1px solid #adb4bf;
+          background: linear-gradient(90deg, #a9b0bc, #b8bfca);
+          border-bottom: 1px solid #9aa2af;
         }
         .dot {
           width: 12px;
@@ -421,8 +421,8 @@ export default function IntroPage() {
         .notice-input,
         .notice-textarea {
           width: 100%;
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
+          background: #eef4fc;
+          border: 1px solid #c3d3ea;
           border-radius: 8px;
           padding: 10px 12px;
           color: #111827;
@@ -501,8 +501,8 @@ export default function IntroPage() {
           gap: 14px;
         }
         .card {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          background: linear-gradient(160deg, #e6eefb, #eff4fd);
+          border: 1px solid #cddbef;
           border-radius: 10px;
           padding: 16px;
           transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
