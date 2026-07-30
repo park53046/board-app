@@ -3,7 +3,7 @@ import Image from 'next/image';
 export default function Home() {
   return (
     <div className="max-w-5xl mx-auto px-4">
-      <h1 className="mt-6 text-xl font-bold text-slate-800 bg-white/70 px-8 py-6 rounded-2xl shadow">
+      <h1 className="mt-8 text-2xl font-bold text-slate-800">
         VIKI샘의 코딩 교실에 오신 것을 환영합니다.
       </h1>
 
@@ -12,22 +12,18 @@ export default function Home() {
           Welcome to VIKI Coding-Room..!
         </h1>
 
-        <div className="rounded-3xl bg-white/80 p-3 sm:p-4 shadow-xl ring-1 ring-slate-200/70 backdrop-blur-sm">
-          <div className="overflow-hidden rounded-2xl">
-            <Image
-              src="/home-hero-v4.jpg"
-              alt="미래형 AI 컴퓨터실"
-              width={1600}
-              height={900}
-              className="block w-full h-auto"
-            />
-          </div>
-        </div>
+        <Image
+          src="/home-hero-v4.jpg"
+          alt="미래형 AI 컴퓨터실"
+          width={1600}
+          height={900}
+          className="block w-full h-auto rounded-2xl"
+        />
       </div>
 
       <div className="space-y-6 pb-14">
         <p className="text-base leading-8 text-slate-700 bg-white/75 px-8 py-6 rounded-2xl shadow">
-          현대 사회는 이른바 &quot;인공지능 사회&quot;라고도 불립니다. 이런 세상에서는 자신의 정체성을 알리기 위한
+           현대 사회는 이른바 &quot;인공지능 사회&quot;라고도 불립니다. 이런 세상에서는 자신의 정체성을 알리기 위한
           다양한 방법이 존재합니다. 그 중 하나가 바로 &quot;홈페이지&quot;입니다. 홈페이지는 개인이나 단체가 자신을 소개하고,
           정보를 공유하며, 소통할 수 있는 공간입니다. 이 공간을 통해 우리는 자신의 생각과 아이디어를 세상에 알릴 수 있습니다.
           사이버 세상에 자신을 공개하고 자신의 존재를 알리는 것은 매우 중요합니다. 이를 통해 우리는 다른 사람들과 연결되고, 새로운 기회를 발견하며,
