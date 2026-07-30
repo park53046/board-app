@@ -14,7 +14,7 @@ export default function Home() {
 
         <Image
           src="/image.jpg"
-          alt="2030 학교 전경"
+          alt="미래형 AI 컴퓨터실"
           width={1600}
           height={900}
           className="rounded-2xl shadow-lg"
