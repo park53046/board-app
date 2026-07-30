@@ -29,7 +29,7 @@ export async function addNoticeAction(
     return { ok: false, error: "내용을 입력해주세요." };
   }
 
-  addNotice(slug, title, content);
+  await addNotice(slug, title, content);
 
   // 해당 과목 페이지를 다시 생성해서 새 공지사항이 바로 보이도록 함
   revalidatePath(`/subjects/${slug}`);

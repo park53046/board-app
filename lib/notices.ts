@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// 과목별 공지사항을 DB(Turso/Prisma)에 저장/조회하는 서버 전용 모듈.
+// (이전에는 data/notices.json 파일에 저장했으나, Vercel 서버리스 환경은
+//  파일 쓰기가 불가/휘발성이라 DB로 옮겼습니다.)
 
-// 과목별 공지사항을 파일(data/notices.json)에 저장/조회하는 서버 전용 모듈.
-// Node 서버가 상시 실행되는 환경(자체 서버 등)에서 사용하는 것을 전제로 합니다.
-// (Vercel 같은 서버리스 환경에서는 파일 쓰기가 영구적으로 보존되지 않을 수 있습니다.)
+import { prisma } from "@/lib/db";
 
 export type Notice = {
   id: string;
@@ -12,45 +12,33 @@ export type Notice = {
   content: string;
 };
 
-type NoticesStore = Record<string, Notice[]>;
-
-const DATA_PATH = path.join(process.cwd(), "data", "notices.json");
-
-function readStore(): NoticesStore {
+// 과목(slug)의 공지사항을 최신순으로 반환합니다.
+export async function getNoticesForSubject(slug: string): Promise<Notice[]> {
   try {
-    const raw = fs.readFileSync(DATA_PATH, "utf-8");
-    return JSON.parse(raw) as NoticesStore;
+    const rows = await (prisma as any).notice.findMany({
+      where: { slug },
+      orderBy: { createdAt: "desc" },
+    });
+    return rows.map((r: any) => ({
+      id: String(r.id),
+      date: new Date(r.createdAt).toISOString().slice(0, 10),
+      title: r.title,
+      content: r.content,
+    }));
   } catch {
-    return {};
+    return [];
   }
 }
 
-function writeStore(store: NoticesStore) {
-  fs.mkdirSync(path.dirname(DATA_PATH), { recursive: true });
-  fs.writeFileSync(DATA_PATH, JSON.stringify(store, null, 2) + "\n", "utf-8");
-}
-
-// 과목(slug)의 공지사항을 최신순으로 반환합니다.
-export function getNoticesForSubject(slug: string): Notice[] {
-  const store = readStore();
-  const list = store[slug] ?? [];
-  return [...list].sort((a, b) => (a.id < b.id ? 1 : -1));
-}
-
 // 새 공지사항을 추가하고 추가된 항목을 반환합니다.
-export function addNotice(slug: string, title: string, content: string): Notice {
-  const store = readStore();
-  if (!store[slug]) store[slug] = [];
-
-  const now = new Date();
-  const notice: Notice = {
-    id: `${now.getTime()}-${Math.random().toString(36).slice(2, 8)}`,
-    date: now.toISOString().slice(0, 10),
-    title,
-    content,
+export async function addNotice(slug: string, title: string, content: string): Promise<Notice> {
+  const r = await (prisma as any).notice.create({
+    data: { slug, title, content },
+  });
+  return {
+    id: String(r.id),
+    date: new Date(r.createdAt).toISOString().slice(0, 10),
+    title: r.title,
+    content: r.content,
   };
-
-  store[slug].push(notice);
-  writeStore(store);
-  return notice;
 }

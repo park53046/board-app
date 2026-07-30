@@ -21,7 +21,7 @@ export default async function SubjectPage({
   const { slug } = await params;
   const subject = getSubject(slug);
   if (!subject) notFound();
-  const notices = getNoticesForSubject(slug);
+  const notices = await getNoticesForSubject(slug);
 
   // subjects-data.ts에 직접 등록한 자료 + public/subjects/<slug>/ 폴더에 넣어둔 파일을 합쳐서 보여줍니다.
   const allMaterials = [

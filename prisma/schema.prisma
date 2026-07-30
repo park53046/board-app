@@ -87,6 +87,15 @@ model BoardPost {
   updatedAt DateTime @updatedAt
 }
 
+// 과목별 공지사항 (intro 페이지에서 등록 → 과목 페이지에 표시)
+model Notice {
+  id        Int      @id @default(autoincrement())
+  slug      String   // 과목 slug (ai/programming/graphics/data-science)
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
 // 교사(관리자)가 다는 댓글
 model Comment {
   id         Int      @id @default(autoincrement())
