@@ -26,6 +26,9 @@ function projectIcon(text: string): string {
   if (t.includes("도서")) return "📚";
   if (t.includes("날씨") || t.includes("일기") || t.includes("예보")) return "🌤️";
   if (t.includes("미세먼지")) return "🌫️";
+  if (t.includes("여행")) return "✈️";
+  if (t.includes("영화") || t.includes("Movie") || t.includes("movie")) return "🎬";
+  if (t.includes("MBTI") || t.includes("직업")) return "🧭";
   if (t.includes("피자") || t.includes("레시피") || t.includes("음식") || t.includes("영양") || t.includes("식단") || t.includes("다이어트")) return "🍽️";
   if (t.includes("게임")) return "🎮";
   return "🤖";
@@ -102,7 +105,10 @@ export default function IntroPage() {
     { name: "AI 레시피 추천", tag: "MCTS", desc: "음식 메뉴 레시피 추천", url: "https://script.google.com/macros/s/AKfycbz09q4Ze7IIPEfwJthDL_xETXLqiHBdK_W5Be-pelRw8Wu6t7qhIXvBjgoYgudETp3Y/exec" },
     { name: "AI 도서 시스템", tag: "MCTS", desc: "도서대출 관리시스템", url: "https://script.google.com/macros/s/AKfycbyHHGCgus0mHMBaUsFHFk3ITNxkGUddFFyn7yyd1Eq64PoSxQSg7TrvCjX9lUh4mkA4zg/exec" },
     { name: "AI 일기 예보 시스템", tag: "MCTS", desc: "일기예보 주간 날씨 예보", url: "https://script.google.com/macros/s/AKfycbwyJ8qBbJQBwceUQ4ednE12aEbEs5y5prE5MzoVgclc6QfHGY_lIDhr7kgq9mKV2w8_/exec" },
-    { name: "AI 미세먼지 분석 시스템", tag: "MCTS", desc: "지역별 미세먼지 분석예측", url: "https://script.google.com/macros/s/AKfycbzrMs7q-Kp-Jkpfua3G1lIiYWx_OyzwOd3QAapI9v-ujBnASu3EWPjKwJSj3zwYuOkF6Q/exec"}
+    { name: "AI 미세먼지 분석 시스템", tag: "MCTS", desc: "지역별 미세먼지 분석예측", url: "https://script.google.com/macros/s/AKfycbzrMs7q-Kp-Jkpfua3G1lIiYWx_OyzwOd3QAapI9v-ujBnASu3EWPjKwJSj3zwYuOkF6Q/exec"},
+    { name: "AI 여행 추천", tag: "MCTS", desc: "맞춤형 여행 추천하기", url: "" },
+    { name: "AI 영화 추천", tag: "MCTS", desc: "영화(Movie) 추천하기", url: "" },
+    { name: "AI 직업 찾기", tag: "MCTS", desc: "MBTI 관련 직업찾기", url: "" }
   ];
 
   return (
