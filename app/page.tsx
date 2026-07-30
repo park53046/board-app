@@ -7,13 +7,13 @@ export default function Home() {
         VIKI샘의 코딩 교실에 오신 것을 환영합니다.
       </h1>
 
-      <div className="py-8">
+      <div className="py-6">
         <h1 className="text-4xl md:text-3xl font-extrabold text-indigo-600 tracking-tight mb-6">
           Welcome to VIKI Coding-Room..!
         </h1>
 
         <Image
-          src="/home-hero-v4.jpg"
+          src="/home-hero-v4.png"
           alt="미래형 AI 컴퓨터실"
           width={1600}
           height={900}
