@@ -12,17 +12,29 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 다크모드에서도 밝은 AI풍 배경을 유지 */
+body {
+  min-height: 100vh;
+  color: #1e293b;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #eef4ff;
+  background-image:
+    radial-gradient(circle at 15% 18%, rgba(120,170,255,0.38), transparent 42%),
+    radial-gradient(circle at 85% 12%, rgba(150,240,205,0.36), transparent 44%),
+    radial-gradient(circle at 78% 82%, rgba(190,175,255,0.34), transparent 46%),
+    radial-gradient(circle at 25% 88%, rgba(160,215,255,0.30), transparent 44%),
+    linear-gradient(160deg, #eef4ff 0%, #f5fbff 45%, #f0fff9 100%);
+  background-attachment: fixed;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* AI 느낌의 은은한 네트워크(점 격자) 오버레이 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%236ea8fe' stroke-opacity='0.16'%3E%3Cpath d='M22 0V44M0 22H44'/%3E%3C/g%3E%3Ccircle cx='22' cy='22' r='1.6' fill='%237c8cff' fill-opacity='0.28'/%3E%3C/svg%3E");
 }
 
 /* 폼 입력 글자색 - 다크모드에서도 항상 진하게 보이도록 */

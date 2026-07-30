@@ -47,7 +47,7 @@ export default async function RootLayout({
           {/* 로그인 상태 영역 (오른쪽) */}
           {session ? (
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ color: "#f5f5dc", fontWeight: 700, fontSize: "14px", whiteSpace: "nowrap" }}>
+              <span style={{ color: "#1a2b4a", fontWeight: 700, fontSize: "14px", whiteSpace: "nowrap" }}>
                 {session.name}님{session.isAdmin ? " (관리자)" : ""}
               </span>
               <form action={logout}>
