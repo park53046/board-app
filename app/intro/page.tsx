@@ -154,7 +154,7 @@ export default function IntroPage() {
 
           {/* 프로젝트 */}
           <section className="block">
-            <p className="comment">{"// 만든 것들 (클릭하면 새 창에서 열립니다)"}</p>
+            <p className="comment">{"// 코딩 작품 전시..ㅋㅋ (클릭하면 새 창에서 열립니다)"}</p>
             <div className="grid">
               {projects.map((p, idx) => {
                 const img = (p as any).img as string | undefined;
@@ -347,8 +347,9 @@ export default function IntroPage() {
           margin-bottom: 32px;
         }
         .comment {
-          color: #94a3b8;
-          font-size: 13px;
+          color: #0d9488;
+          font-size: 15px;
+          font-weight: 600;
           margin: 0 0 12px;
         }
         .text {
