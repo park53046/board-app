@@ -265,20 +265,20 @@ export default function IntroPage() {
         .window {
           width: 100%;
           max-width: 760px;
-          background: linear-gradient(165deg, #d3e8d8, #dcefe0);
+          background: linear-gradient(165deg, #cbd0d8, #d8dce2);
           backdrop-filter: blur(6px);
-          border: 1px solid #bcd8c4;
+          border: 1px solid #b3b9c4;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 20px 50px rgba(60, 120, 90, 0.20);
+          box-shadow: 0 20px 50px rgba(40, 50, 70, 0.22);
         }
         .titlebar {
           display: flex;
           align-items: center;
           gap: 8px;
           padding: 12px 16px;
-          background: linear-gradient(90deg, #cbe6d3, #d6ecdb);
-          border-bottom: 1px solid #b6d5bf;
+          background: linear-gradient(90deg, #bcc2cc, #cad0d8);
+          border-bottom: 1px solid #adb4bf;
         }
         .dot {
           width: 12px;
