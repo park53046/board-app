@@ -68,7 +68,7 @@ export default function IntroPage() {
   // url 이 채워진 항목만 클릭 시 새 창으로 열립니다. (빈 "" 은 일반 카드)
   const projects = [
     
-    { name: "급식 조회 앱", tag: "NEIS API", desc: "학교 급식 메뉴 조회", url: "https://script.google.com/macros/s/AKfycbyA2Tc3L12i33MVjNSYvX4BiRtaEQ71jrD7MtW0jYi-gtsZwCusPZbOOnglrqyeZkBXqQ/exec" },
+    { name: "급식 조회 앱", tag: "NEIS API", desc: "학교 급식 메뉴 조회", img: "/lunch-menu.jpg", url: "https://script.google.com/macros/s/AKfycbyA2Tc3L12i33MVjNSYvX4BiRtaEQ71jrD7MtW0jYi-gtsZwCusPZbOOnglrqyeZkBXqQ/exec" },
     { name: "감독 배정 관리", tag: "GAS", desc: "시험·감독배정", url: "https://script.google.com/macros/s/AKfycbyD6vXQbJQVxwsNSY8ht7tuYtH0VTiSmqD1LoOl7PbpupNWHJkbxMYZ9zKsNixCghnzCg/exec" },
     { name: "시간표 관리 도구", tag: "GAS", desc: "학교 시간표관리 · 수업교환", url: "https://script.google.com/macros/s/AKfycbx75CugxJ6aVV16iokCvRLlm6Gm5ei75BjLym_F8f1B2j6X1aaV_N7dNU7s8i6_M9Br/exec" },
     { name: "바둑 교육 게임", tag: "MCTS", desc: "바둑 공략법 익히기", url: "https://script.google.com/macros/s/AKfycbxTq1Anpxg0oDz3HtTYmRTZ92rs0qAN0S-q3XTc32VEmmjqFOw7m6Fsb3VNpf0wCkDeNg/exec" },
@@ -157,9 +157,14 @@ export default function IntroPage() {
             <p className="comment">{"// 만든 것들 (클릭하면 새 창에서 열립니다)"}</p>
             <div className="grid">
               {projects.map((p, idx) => {
+                const img = (p as any).img as string | undefined;
                 const inner = (
                   <>
-                    <div className="card-icon">{projectIcon(p.desc + p.name)}</div>
+                    {img ? (
+                      <img src={img} alt={p.desc} className="card-photo" />
+                    ) : (
+                      <div className="card-icon">{projectIcon(p.desc + p.name)}</div>
+                    )}
                     <p className="card-sub">{p.tag}</p>
                     <h3 className="card-name">{p.desc}</h3>
                   </>
@@ -472,6 +477,13 @@ export default function IntroPage() {
           line-height: 1;
           border-radius: 16px;
           background: linear-gradient(160deg, #dbf7ee, #eafaf4);
+          margin-bottom: 14px;
+        }
+        .card-photo {
+          width: 100%;
+          height: 110px;
+          object-fit: cover;
+          border-radius: 12px;
           margin-bottom: 14px;
         }
         .card-sub {
