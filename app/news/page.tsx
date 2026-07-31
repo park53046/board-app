@@ -49,7 +49,7 @@ const CATEGORIES: { name: string; emoji: string; url: string }[] = [
   { name: "사회", emoji: "🏙️", url: "https://news.google.com/rss/search?q=" + encodeURIComponent("사회 when:1d") + "&hl=ko&gl=KR&ceid=KR:ko" },
   { name: "세계", emoji: "🌏", url: "https://news.google.com/rss/headlines/section/topic/WORLD?hl=ko&gl=KR&ceid=KR:ko" },
   { name: "IT·과학", emoji: "🔬", url: "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=ko&gl=KR&ceid=KR:ko" },
-  { name: "문화", emoji: "🎭", url: "https://news.google.com/rss/search?q=" + encodeURIComponent("문화 예술 공연 전시 when:1d") + "&hl=ko&gl=KR&ceid=KR:ko" },
+  { name: "연예·엔터", emoji: "🎬", url: "https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?hl=ko&gl=KR&ceid=KR:ko" },
 ];
 
 async function getNews(url: string): Promise<NewsItem[]> {
