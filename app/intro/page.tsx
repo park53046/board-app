@@ -10,27 +10,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-// 프로젝트 설명 키워드로 아이콘(이모지) 자동 지정
-function projectIcon(text: string): string {
-  const t = text;
-  if (t.includes("급식")) return "🍱";
-  if (t.includes("감독") || t.includes("시험")) return "📝";
-  if (t.includes("시간표")) return "🗓️";
-  if (t.includes("바둑")) return "⚫";
-  if (t.includes("오목")) return "⚪";
-  if (t.includes("윷")) return "🎲";
-  if (t.includes("사다리")) return "🪜";
-  if (t.includes("최저가") || t.includes("물건") || t.includes("쇼핑")) return "🛒";
-  if (t.includes("도서")) return "📚";
-  if (t.includes("날씨") || t.includes("일기") || t.includes("예보")) return "🌤️";
-  if (t.includes("미세먼지")) return "🌫️";
-  if (t.includes("여행")) return "✈️";
-  if (t.includes("영화") || t.includes("Movie") || t.includes("movie")) return "🎬";
-  if (t.includes("MBTI") || t.includes("직업")) return "🧭";
-  if (t.includes("피자") || t.includes("레시피") || t.includes("음식") || t.includes("영양") || t.includes("식단") || t.includes("다이어트")) return "🍽️";
-  if (t.includes("게임")) return "🎮";
-  return "🤖";
-}
+type SubjectData = {
+  name: string;
+  notices: { id: string; date: string; title: string; content: string }[];
+  materials: { name: string; url: string }[];
+  assignmentForms: { label: string; url: string }[];
+};
 
 export default function IntroPage() {
   // 타이핑 효과용 상태
@@ -65,28 +50,29 @@ export default function IntroPage() {
     { name: "데이터과학", slug: "data-science" },
   ];
 
-  // url 이 채워진 항목만 클릭 시 새 창으로 열립니다. (빈 "" 은 일반 카드)
-  const projects = [
-    
-    { name: "급식 조회 앱", tag: "NEIS API", desc: "학교 급식 메뉴 조회", img: "/lunch-menu.jpg", url: "https://script.google.com/macros/s/AKfycbyA2Tc3L12i33MVjNSYvX4BiRtaEQ71jrD7MtW0jYi-gtsZwCusPZbOOnglrqyeZkBXqQ/exec" },
-    { name: "감독 배정 관리", tag: "GAS", desc: "시험·감독배정", img: "/work-exam.jpg", url: "https://script.google.com/macros/s/AKfycbwE4qKdtwi3oQ-xglQ82RxyXO0ib_2mnVXwDJc8HRGGgphtIJugQs4FB6qf3nWtE7re/exec" },
-    { name: "시간표 관리 도구", tag: "GAS", desc: "학교 시간표관리 · 수업교환", img: "/work-timetable.jpg", url: "https://script.google.com/macros/s/AKfycbx75CugxJ6aVV16iokCvRLlm6Gm5ei75BjLym_F8f1B2j6X1aaV_N7dNU7s8i6_M9Br/exec" },
-    { name: "바둑 교육 게임", tag: "MCTS", desc: "바둑 공략법 익히기", img: "/work-baduk.png", url: "https://script.google.com/macros/s/AKfycbxTq1Anpxg0oDz3HtTYmRTZ92rs0qAN0S-q3XTc32VEmmjqFOw7m6Fsb3VNpf0wCkDeNg/exec" },
-    { name: "바둑 교육 게임", tag: "MCTS", desc: "AI 오목 경기 도구", img: "/work-omok.jpg", url: "https://script.google.com/macros/s/AKfycbz73W8U-IAb_gvSOxPSACyn8wm7zoBdVelv3Iap5ajYswmYCffAwEkBe4kRY-dNUOX_/exec" },
-    { name: "생활도우미 도구", tag: "MCTS", desc: "AI 최저가 물건찾기", img: "/work-cart.jpg", url: "https://script.google.com/macros/s/AKfycbxnUegDQQLDAQsb4pCBVE0_ZZa_RwNOJHhXYdBUwOTqHYcx8lAr536_bnRzFwUc4Bvp/exec" },
-    { name: "디지털 게임 도구", tag: "MCTS", desc: "AI 디지털 윷놀이", img: "/work-yut.jpg", url: "https://script.google.com/macros/s/AKfycbx50U3cPj2b4cACdpuq1OcYFxqgr1Z9DAaEVsSArgFVw91iz4b6eUEpD3nvTiNzjONK/exec" },
-    { name: "디지털 게임 도구", tag: "MCTS", desc: "AI 사다리 게임", img: "/work-ladder.jpg", url: "https://script.google.com/macros/s/AKfycbzIW5O4aEhIxpFasJ3_NhSRA25apMMovgjLNIaKwcii6vSkizEnbDSNko2dnKJnl2D1/exec" },
-    { name: "AI 생활 도우미", tag: "MCTS", desc: "AI 피자 추천하기", img: "/work-pizza.png", url: "https://script.google.com/macros/s/AKfycbyOlKv_W11ZWfAFXywH4jq_eq_Bse4uMyBc3FpD32fAqyJv_sdeUiWoQyJkD21Xzl3FqA/exec" },
-    { name: "AI 다이어트", tag: "MCTS", desc: "AI 음식 영양 분석 도구", img: "/work-nutrition.jpg", url: "https://script.google.com/macros/s/AKfycbxJj8bWXd_VIFKm9_Cib4qiQQbShWD3_FVHCjuLaBF4DLaiSrbZ2nRuY1QfZqhuABgvng/exec" },
-    { name: "AI 다이어트", tag: "MCTS", desc: "나의 식단 맞춤형 관리", img: "/work-diet.jpg", url: "https://script.google.com/macros/s/AKfycbyGMjE6OxJ6i4NUpwEY2JZ2cNkL3ZvbvJuqYrYh92lRiqwlCOxvHE_DlMq3zCaad-H0/exec" },
-    { name: "AI 레시피 추천", tag: "MCTS", desc: "음식 메뉴 레시피 추천", img: "/work-recipe.jpg", url: "https://script.google.com/macros/s/AKfycbz09q4Ze7IIPEfwJthDL_xETXLqiHBdK_W5Be-pelRw8Wu6t7qhIXvBjgoYgudETp3Y/exec" },
-    { name: "AI 도서 시스템", tag: "MCTS", desc: "도서대출 관리시스템", img: "/work-book.jpg", url: "https://script.google.com/macros/s/AKfycbyHHGCgus0mHMBaUsFHFk3ITNxkGUddFFyn7yyd1Eq64PoSxQSg7TrvCjX9lUh4mkA4zg/exec" },
-    { name: "AI 일기 예보 시스템", tag: "MCTS", desc: "일기예보 주간 날씨 예보", img: "/work-weather.jpg", url: "https://script.google.com/macros/s/AKfycbwyJ8qBbJQBwceUQ4ednE12aEbEs5y5prE5MzoVgclc6QfHGY_lIDhr7kgq9mKV2w8_/exec" },
-    { name: "AI 미세먼지 분석 시스템", tag: "MCTS", desc: "지역별 미세먼지 분석예측", img: "/work-dust.png", url: "https://script.google.com/macros/s/AKfycbzrMs7q-Kp-Jkpfua3G1lIiYWx_OyzwOd3QAapI9v-ujBnASu3EWPjKwJSj3zwYuOkF6Q/exec"},
-    { name: "AI 여행 추천", tag: "MCTS", desc: "맞춤형 수학여행 추천하기", img: "/work-trip.jpg", url: "https://script.google.com/macros/s/AKfycbwthEa7goNJi6hUGOJPLo8ZRt6-41P_giUNT0MPmoNdr6Nt850Nn2zJ68DjoQMLeqbNSQ/exec" },
-    { name: "AI 영화 추천", tag: "MCTS", desc: "영화(Movie) 추천하기", img: "/work-movie.jpg", url: "https://script.google.com/macros/s/AKfycby8VyUUAu9rAdK-cZIpOI68x4bfMAZSBpQgRwYJQd2Ylrizi3qFr8VijF4QWXSCtZVN7Q/exec" },
-    { name: "AI 직업 찾기", tag: "MCTS", desc: "MBTI 미래 직업찾기", img: "/work-mbti.jpg", url: "https://script.google.com/macros/s/AKfycbz7YY0DvUzVJoSBxScZ5sTpPaWfqPMzvd3NKTS7eLtFFjXpdYJj-xJ5qUkD42300mo1gQ/exec" }
-  ];
+  // 담당 과목 클릭 → 해당 과목 내용을 아래 프레임으로 표시
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const [subjectData, setSubjectData] = useState<SubjectData | null>(null);
+  const [subjectLoading, setSubjectLoading] = useState(false);
+
+  async function openSubject(slug: string) {
+    if (activeSlug === slug) {
+      setActiveSlug(null);
+      setSubjectData(null);
+      return;
+    }
+    setActiveSlug(slug);
+    setSubjectData(null);
+    setSubjectLoading(true);
+    try {
+      const res = await fetch(`/api/subject?slug=${slug}`);
+      setSubjectData(await res.json());
+    } catch {
+      setSubjectData(null);
+    } finally {
+      setSubjectLoading(false);
+    }
+  }
 
   return (
     <main className="page">
@@ -142,52 +128,84 @@ export default function IntroPage() {
 
           {/* 담당 과목 */}
           <section className="block">
-            <p className="comment">{"// 담당 과목"}</p>
+            <p className="comment">{"// 담당 과목 (누르면 아래에 과목 내용이 열립니다)"}</p>
             <div className="chips">
               {teaches.map((t) => (
-                <Link key={t.slug} href={`/subjects/${t.slug}`} className="subject-btn">
+                <button
+                  key={t.slug}
+                  type="button"
+                  onClick={() => openSubject(t.slug)}
+                  className={`subject-btn${activeSlug === t.slug ? " subject-btn-active" : ""}`}
+                >
                   {t.name}
-                </Link>
+                </button>
               ))}
             </div>
+
+            {/* 과목 내용 프레임 */}
+            {activeSlug && (
+              <div className="subject-frame">
+                {subjectLoading ? (
+                  <p className="sf-loading">불러오는 중…</p>
+                ) : subjectData ? (
+                  <>
+                    <div className="sf-head">
+                      <h3 className="sf-title">📘 {subjectData.name}</h3>
+                      <button type="button" className="sf-close" onClick={() => { setActiveSlug(null); setSubjectData(null); }}>닫기 ✕</button>
+                    </div>
+
+                    <h4 className="sf-sec">공지사항</h4>
+                    {subjectData.notices.length === 0 ? (
+                      <p className="sf-empty">등록된 공지가 없습니다.</p>
+                    ) : (
+                      <ul className="sf-list">
+                        {subjectData.notices.map((n) => (
+                          <li key={n.id} className="sf-notice">
+                            <div className="sf-notice-top">
+                              <span className="sf-notice-title">{n.title}</span>
+                              <span className="sf-notice-date">{n.date}</span>
+                            </div>
+                            <p className="sf-notice-body">{n.content}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    <h4 className="sf-sec">수업 자료</h4>
+                    {subjectData.materials.length === 0 ? (
+                      <p className="sf-empty">등록된 자료가 없습니다.</p>
+                    ) : (
+                      <ul className="sf-materials">
+                        {subjectData.materials.map((m, i) => (
+                          <li key={i}>
+                            <a href={m.url} target="_blank" rel="noopener noreferrer" className="sf-link">📄 {m.name}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    <h4 className="sf-sec">과제 제출</h4>
+                    <div className="sf-forms">
+                      {subjectData.assignmentForms.map((f, i) =>
+                        f.url ? (
+                          <a key={i} href={f.url} target="_blank" rel="noopener noreferrer" className="sf-form-btn">{f.label}</a>
+                        ) : (
+                          <span key={i} className="sf-empty">{f.label} 준비 중</span>
+                        )
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <p className="sf-empty">내용을 불러오지 못했습니다.</p>
+                )}
+              </div>
+            )}
           </section>
 
-          {/* 프로젝트 */}
+          {/* 코딩 작품 전시 → 별도 페이지 */}
           <section className="block">
-            <p className="comment">{"// 코딩 작품 전시..ㅋㅋ (클릭하면 새 창에서 열립니다)"}</p>
-            <div className="grid">
-              {projects.map((p, idx) => {
-                const img = (p as any).img as string | undefined;
-                const inner = (
-                  <>
-                    {img ? (
-                      <img src={img} alt={p.desc} className="card-photo" />
-                    ) : (
-                      <div className="card-icon">{projectIcon(p.desc + p.name)}</div>
-                    )}
-                    <p className="card-sub">{p.tag}</p>
-                    <h3 className="card-name">{p.desc}</h3>
-                  </>
-                );
-
-                // url 이 있으면 <a> 링크 카드, 없으면 일반 <article> 카드
-                return p.url ? (
-                  <a
-                    key={`${p.name}-${idx}`}
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="card card-link"
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  <article key={`${p.name}-${idx}`} className="card">
-                    {inner}
-                  </article>
-                );
-              })}
-            </div>
+            <p className="comment">{"// 코딩 작품 전시"}</p>
+            <Link href="/works" className="works-link">🚀 코딩 작품 전시 보러가기 →</Link>
           </section>
 
           {/* 푸터 */}
@@ -509,6 +527,142 @@ export default function IntroPage() {
           margin-top: 36px;
           padding-top: 20px;
           border-top: 1px solid #e2e8f0;
+        }
+        .subject-btn-active {
+          background: #14b8a6 !important;
+          color: #ffffff !important;
+          border-color: #0d9488 !important;
+        }
+        .subject-frame {
+          margin-top: 16px;
+          background: #ffffff;
+          border: 1px solid #cfeee0;
+          border-radius: 14px;
+          padding: 20px 22px;
+          box-shadow: 0 8px 22px rgba(20, 150, 120, 0.12);
+        }
+        .sf-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+        .sf-title {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 800;
+          color: #0d9488;
+        }
+        .sf-close {
+          background: #f1f5f9;
+          border: none;
+          border-radius: 8px;
+          padding: 6px 12px;
+          font-size: 13px;
+          color: #64748b;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .sf-close:hover {
+          background: #e2e8f0;
+        }
+        .sf-sec {
+          margin: 18px 0 8px;
+          font-size: 15px;
+          font-weight: 700;
+          color: #1e293b;
+          border-left: 3px solid #14b8a6;
+          padding-left: 8px;
+        }
+        .sf-loading,
+        .sf-empty {
+          color: #94a3b8;
+          font-size: 14px;
+          margin: 4px 0;
+        }
+        .sf-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .sf-notice {
+          background: #f8fafc;
+          border: 1px solid #eef2f7;
+          border-radius: 10px;
+          padding: 12px 14px;
+        }
+        .sf-notice-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 8px;
+          margin-bottom: 4px;
+        }
+        .sf-notice-title {
+          font-weight: 700;
+          color: #1e293b;
+          font-size: 14px;
+        }
+        .sf-notice-date {
+          color: #94a3b8;
+          font-size: 12px;
+          white-space: nowrap;
+        }
+        .sf-notice-body {
+          margin: 0;
+          font-size: 13.5px;
+          color: #475569;
+          line-height: 1.6;
+          white-space: pre-wrap;
+        }
+        .sf-materials {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .sf-link {
+          color: #0d9488;
+          text-decoration: none;
+          font-size: 14px;
+        }
+        .sf-link:hover {
+          text-decoration: underline;
+        }
+        .sf-forms {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .sf-form-btn {
+          display: inline-block;
+          background: linear-gradient(135deg, #14b8a6, #38bdf8);
+          color: #fff;
+          text-decoration: none;
+          padding: 8px 16px;
+          border-radius: 999px;
+          font-size: 13px;
+          font-weight: 700;
+        }
+        .works-link {
+          display: inline-block;
+          background: #e6f7f1;
+          color: #0d9488;
+          border: 1px solid #b9e8db;
+          border-radius: 10px;
+          padding: 12px 20px;
+          font-size: 15px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: background 0.15s, transform 0.1s;
+        }
+        .works-link:hover {
+          background: #d3f2e8;
+          transform: translateY(-2px);
         }
         @media (prefers-reduced-motion: reduce) {
           .cursor,
