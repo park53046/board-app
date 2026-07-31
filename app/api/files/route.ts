@@ -14,6 +14,7 @@ export async function GET() {
     return Response.json({ ok: false, loggedIn: false, items: [] }, { status: 401 });
   }
   const items = await (prisma as any).fileItem.findMany({
+    where: { subjectSlug: null }, // 과목 수업자료는 자료실에서 제외
     orderBy: { createdAt: "desc" },
   });
   return Response.json({ ok: true, loggedIn: true, isAdmin: !!session.isAdmin, me: session.studentId, items });

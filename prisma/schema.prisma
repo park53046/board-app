@@ -50,6 +50,7 @@ model FileItem {
   size              Int      // 파일 크기(바이트)
   uploaderStudentId String? // 올린 사람 학번
   uploaderName      String? // 올린 사람 이름
+  subjectSlug       String? // 과목 수업자료면 과목 slug, 일반 자료실이면 null
   createdAt         DateTime @default(now())
 }
 

@@ -7,13 +7,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { upload } from "@vercel/blob/client";
 
 type SubjectData = {
   name: string;
   notices: { id: string; date: string; title: string; content: string }[];
-  materials: { name: string; url: string }[];
+  materials: { id?: number; name: string; url: string }[];
   assignmentForms: { label: string; url: string }[];
 };
 
@@ -55,14 +56,16 @@ export default function IntroPage() {
   const [subjectData, setSubjectData] = useState<SubjectData | null>(null);
   const [subjectLoading, setSubjectLoading] = useState(false);
 
-  // 관리자 여부 + 공지 작성 폼
+  // 관리자 여부 + 작성 폼
   const [isAdmin, setIsAdmin] = useState(false);
   const [showNoticeForm, setShowNoticeForm] = useState(false);
+  const [nType, setNType] = useState<"notice" | "material">("notice");
   const [nSlug, setNSlug] = useState("");
   const [nTitle, setNTitle] = useState("");
   const [nContent, setNContent] = useState("");
   const [nSubmitting, setNSubmitting] = useState(false);
   const [nMsg, setNMsg] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/me")
@@ -88,27 +91,48 @@ export default function IntroPage() {
   async function submitNotice(e: React.FormEvent) {
     e.preventDefault();
     setNMsg("");
+    if (!nSlug) { setNMsg("과목을 선택해주세요."); return; }
     setNSubmitting(true);
     try {
-      const r = await fetch("/api/notice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: nSlug, title: nTitle, content: nContent }),
-      });
-      const d = await r.json();
-      if (r.ok) {
-        setNTitle("");
-        setNContent("");
-        setShowNoticeForm(false);
-        await loadSubject(nSlug); // 방금 작성한 과목 내용 열어서 반영
+      if (nType === "notice") {
+        const r = await fetch("/api/notice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: nSlug, title: nTitle, content: nContent }),
+        });
+        const d = await r.json();
+        if (!r.ok) { setNMsg(d.error || "등록에 실패했습니다."); return; }
       } else {
-        setNMsg(d.error || "등록에 실패했습니다.");
+        // 수업자료 = 이미지 파일 업로드 (10MB 이내)
+        const file = fileRef.current?.files?.[0];
+        if (!file) { setNMsg("이미지 파일을 선택해주세요."); return; }
+        if (!file.type.startsWith("image/")) { setNMsg("이미지 파일만 올릴 수 있어요."); return; }
+        if (file.size > 10 * 1024 * 1024) { setNMsg("10MB 이하만 올릴 수 있어요."); return; }
+        const blob = await upload(file.name, file, { access: "private", handleUploadUrl: "/api/files/upload" });
+        const r = await fetch("/api/material", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: nSlug, name: file.name, url: blob.url, pathname: blob.pathname, size: file.size }),
+        });
+        const d = await r.json();
+        if (!r.ok) { setNMsg(d.error || "업로드에 실패했습니다."); return; }
+        if (fileRef.current) fileRef.current.value = "";
       }
+      setNTitle("");
+      setNContent("");
+      setShowNoticeForm(false);
+      await loadSubject(nSlug); // 방금 등록한 과목 내용 열어서 반영
     } catch {
       setNMsg("등록에 실패했습니다.");
     } finally {
       setNSubmitting(false);
     }
+  }
+
+  async function deleteMaterial(id: number, slug: string) {
+    if (!confirm("이 수업자료를 삭제할까요?")) return;
+    await fetch(`/api/material?id=${id}`, { method: "DELETE" });
+    await loadSubject(slug);
   }
 
   async function openSubject(slug: string) {
@@ -210,31 +234,36 @@ export default function IntroPage() {
             {/* 공지 작성 폼 (관리자 전용) */}
             {isAdmin && showNoticeForm && (
               <form onSubmit={submitNotice} className="nform">
-                <div className="nform-title">📢 공지사항 작성</div>
+                <div className="nform-title">✎ 등록하기</div>
+
+                {/* 유형 선택 */}
+                <div className="ntype">
+                  <button type="button" onClick={() => { setNType("notice"); setNMsg(""); }} className={`ntype-btn${nType === "notice" ? " ntype-on" : ""}`}>📢 공지사항</button>
+                  <button type="button" onClick={() => { setNType("material"); setNMsg(""); }} className={`ntype-btn${nType === "material" ? " ntype-on" : ""}`}>📎 수업자료</button>
+                </div>
+
                 <select value={nSlug} onChange={(e) => setNSlug(e.target.value)} required className="nform-select">
                   <option value="" disabled>과목 선택</option>
                   {teaches.map((t) => (
                     <option key={t.slug} value={t.slug}>{t.name}</option>
                   ))}
                 </select>
-                <input
-                  value={nTitle}
-                  onChange={(e) => setNTitle(e.target.value)}
-                  placeholder="제목"
-                  required
-                  className="nform-input"
-                />
-                <textarea
-                  value={nContent}
-                  onChange={(e) => setNContent(e.target.value)}
-                  placeholder="내용"
-                  required
-                  rows={4}
-                  className="nform-textarea"
-                />
+
+                {nType === "notice" ? (
+                  <>
+                    <input value={nTitle} onChange={(e) => setNTitle(e.target.value)} placeholder="제목" className="nform-input" />
+                    <textarea value={nContent} onChange={(e) => setNContent(e.target.value)} placeholder="내용" rows={4} className="nform-textarea" />
+                  </>
+                ) : (
+                  <div>
+                    <input ref={fileRef} type="file" accept="image/*" className="nform-file" />
+                    <p className="nform-hint">이미지 파일만, 10MB 이내</p>
+                  </div>
+                )}
+
                 <div className="nform-actions">
                   <button type="submit" disabled={nSubmitting} className="nform-submit">
-                    {nSubmitting ? "등록 중…" : "공지 등록"}
+                    {nSubmitting ? "등록 중…" : nType === "notice" ? "공지 등록" : "자료 올리기"}
                   </button>
                   <button type="button" onClick={() => setShowNoticeForm(false)} className="nform-cancel">취소</button>
                   {nMsg && <span className="nform-msg">{nMsg}</span>}
@@ -277,8 +306,11 @@ export default function IntroPage() {
                     ) : (
                       <ul className="sf-materials">
                         {subjectData.materials.map((m, i) => (
-                          <li key={i}>
+                          <li key={i} className="sf-material-row">
                             <a href={m.url} target="_blank" rel="noopener noreferrer" className="sf-link">📄 {m.name}</a>
+                            {isAdmin && m.id != null && (
+                              <button type="button" className="sf-del" onClick={() => deleteMaterial(m.id!, activeSlug!)}>삭제</button>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -718,6 +750,52 @@ export default function IntroPage() {
         .nform-msg {
           font-size: 13px;
           color: #dc2626;
+        }
+        .ntype {
+          display: flex;
+          gap: 8px;
+        }
+        .ntype-btn {
+          flex: 1;
+          background: #fff;
+          border: 1px solid #e2c9a8;
+          border-radius: 8px;
+          padding: 8px 10px;
+          font-size: 13px;
+          font-weight: 700;
+          color: #92400e;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .ntype-on {
+          background: #f59e0b;
+          color: #fff;
+          border-color: #d97706;
+        }
+        .nform-file {
+          width: 100%;
+          font-size: 13px;
+          color: #334155;
+        }
+        .nform-hint {
+          margin: 6px 0 0;
+          font-size: 12px;
+          color: #94a3b8;
+        }
+        .sf-material-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .sf-del {
+          background: transparent;
+          border: 1px solid #fca5a5;
+          color: #dc2626;
+          border-radius: 6px;
+          padding: 2px 8px;
+          font-size: 12px;
+          cursor: pointer;
+          font-family: inherit;
         }
         .subject-frame {
           margin-top: 16px;
