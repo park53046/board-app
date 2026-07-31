@@ -55,6 +55,62 @@ export default function IntroPage() {
   const [subjectData, setSubjectData] = useState<SubjectData | null>(null);
   const [subjectLoading, setSubjectLoading] = useState(false);
 
+  // 관리자 여부 + 공지 작성 폼
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showNoticeForm, setShowNoticeForm] = useState(false);
+  const [nSlug, setNSlug] = useState("");
+  const [nTitle, setNTitle] = useState("");
+  const [nContent, setNContent] = useState("");
+  const [nSubmitting, setNSubmitting] = useState(false);
+  const [nMsg, setNMsg] = useState("");
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((d) => setIsAdmin(!!d.isAdmin))
+      .catch(() => {});
+  }, []);
+
+  async function loadSubject(slug: string) {
+    setActiveSlug(slug);
+    setSubjectData(null);
+    setSubjectLoading(true);
+    try {
+      const res = await fetch(`/api/subject?slug=${slug}`);
+      setSubjectData(await res.json());
+    } catch {
+      setSubjectData(null);
+    } finally {
+      setSubjectLoading(false);
+    }
+  }
+
+  async function submitNotice(e: React.FormEvent) {
+    e.preventDefault();
+    setNMsg("");
+    setNSubmitting(true);
+    try {
+      const r = await fetch("/api/notice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: nSlug, title: nTitle, content: nContent }),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        setNTitle("");
+        setNContent("");
+        setShowNoticeForm(false);
+        await loadSubject(nSlug); // 방금 작성한 과목 내용 열어서 반영
+      } else {
+        setNMsg(d.error || "등록에 실패했습니다.");
+      }
+    } catch {
+      setNMsg("등록에 실패했습니다.");
+    } finally {
+      setNSubmitting(false);
+    }
+  }
+
   async function openSubject(slug: string) {
     if (activeSlug === slug) {
       setActiveSlug(null);
@@ -140,7 +196,51 @@ export default function IntroPage() {
                   {t.name}
                 </button>
               ))}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => { setShowNoticeForm((v) => !v); setNMsg(""); }}
+                  className="notice-write-btn"
+                >
+                  ✎ 공지 쓰기
+                </button>
+              )}
             </div>
+
+            {/* 공지 작성 폼 (관리자 전용) */}
+            {isAdmin && showNoticeForm && (
+              <form onSubmit={submitNotice} className="nform">
+                <div className="nform-title">📢 공지사항 작성</div>
+                <select value={nSlug} onChange={(e) => setNSlug(e.target.value)} required className="nform-select">
+                  <option value="" disabled>과목 선택</option>
+                  {teaches.map((t) => (
+                    <option key={t.slug} value={t.slug}>{t.name}</option>
+                  ))}
+                </select>
+                <input
+                  value={nTitle}
+                  onChange={(e) => setNTitle(e.target.value)}
+                  placeholder="제목"
+                  required
+                  className="nform-input"
+                />
+                <textarea
+                  value={nContent}
+                  onChange={(e) => setNContent(e.target.value)}
+                  placeholder="내용"
+                  required
+                  rows={4}
+                  className="nform-textarea"
+                />
+                <div className="nform-actions">
+                  <button type="submit" disabled={nSubmitting} className="nform-submit">
+                    {nSubmitting ? "등록 중…" : "공지 등록"}
+                  </button>
+                  <button type="button" onClick={() => setShowNoticeForm(false)} className="nform-cancel">취소</button>
+                  {nMsg && <span className="nform-msg">{nMsg}</span>}
+                </div>
+              </form>
+            )}
 
             {/* 과목 내용 프레임 */}
             {activeSlug && (
@@ -532,6 +632,92 @@ export default function IntroPage() {
           background: #14b8a6 !important;
           color: #ffffff !important;
           border-color: #0d9488 !important;
+        }
+        .notice-write-btn {
+          background: #fff7ed;
+          color: #c2410c;
+          border: 1px dashed #fdba74;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          font-family: inherit;
+          transition: background 0.15s;
+        }
+        .notice-write-btn:hover {
+          background: #ffedd5;
+        }
+        .nform {
+          margin-top: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          background: #fffdf7;
+          border: 1px solid #fde4c4;
+          border-radius: 12px;
+          padding: 16px 18px;
+          max-width: 520px;
+        }
+        .nform-title {
+          font-size: 15px;
+          font-weight: 800;
+          color: #c2410c;
+        }
+        .nform-select,
+        .nform-input,
+        .nform-textarea {
+          width: 100%;
+          box-sizing: border-box;
+          background: #ffffff;
+          border: 1px solid #e2c9a8;
+          border-radius: 8px;
+          padding: 10px 12px;
+          color: #111827;
+          font-family: inherit;
+          font-size: 14px;
+          resize: vertical;
+        }
+        .nform-select:focus,
+        .nform-input:focus,
+        .nform-textarea:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+        .nform-actions {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .nform-submit {
+          background: linear-gradient(135deg, #f59e0b, #fb923c);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 9px 18px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .nform-submit:disabled {
+          opacity: 0.6;
+          cursor: default;
+        }
+        .nform-cancel {
+          background: transparent;
+          border: 1px solid #cbd5e1;
+          color: #64748b;
+          border-radius: 8px;
+          padding: 9px 14px;
+          font-size: 14px;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .nform-msg {
+          font-size: 13px;
+          color: #dc2626;
         }
         .subject-frame {
           margin-top: 16px;
