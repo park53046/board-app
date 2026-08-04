@@ -12,34 +12,32 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 다크모드에서도 밝은 AI풍 배경을 유지 */
+/* 다크 시네마틱 배경 */
 body {
   min-height: 100vh;
-  color: #1e293b;
+  color: #e5e7eb;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #eef3fb;
+  background-color: #070a12;
   background-image:
-    radial-gradient(circle at 15% 18%, rgba(120,170,255,0.24), transparent 45%),
-    radial-gradient(circle at 85% 12%, rgba(150,240,205,0.22), transparent 46%),
-    radial-gradient(circle at 78% 85%, rgba(190,175,255,0.20), transparent 48%),
-    linear-gradient(160deg, #eef3fb 0%, #f4f9ff 50%, #eefaf4 100%);
+    radial-gradient(circle at 18% 12%, rgba(59, 90, 180, 0.35), transparent 45%),
+    radial-gradient(circle at 85% 8%, rgba(88, 60, 180, 0.28), transparent 48%),
+    radial-gradient(circle at 75% 90%, rgba(30, 90, 140, 0.28), transparent 50%),
+    linear-gradient(165deg, #070a12 0%, #0b1020 55%, #090b16 100%);
   background-attachment: fixed;
 }
 
-/* 은은한 사선(빗줄기) 무늬 오버레이 */
+/* 은은한 별/입자 오버레이 */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: repeating-linear-gradient(
-    68deg,
-    rgba(110, 150, 220, 0.07) 0px,
-    rgba(110, 150, 220, 0.07) 1px,
-    transparent 1px,
-    transparent 13px
-  );
+  background-image:
+    radial-gradient(rgba(160, 190, 255, 0.20) 1px, transparent 1px),
+    radial-gradient(rgba(160, 190, 255, 0.12) 1px, transparent 1px);
+  background-size: 44px 44px, 88px 88px;
+  background-position: 0 0, 22px 22px;
 }
 
 /* 폼 입력 글자색 - 다크모드에서도 항상 진하게 보이도록 */
@@ -60,7 +58,7 @@ textarea::placeholder {
 .nav-btn {
   display: inline-block;
   background-color: transparent;
-  color: #6b7280;
+  color: #9aa4b8;
   border: none;
   border-radius: 8px;
   padding: 6px 11px;
@@ -71,8 +69,8 @@ textarea::placeholder {
 }
 
 .nav-btn:hover {
-  color: #4f46e5;
-  background-color: rgba(99, 102, 241, 0.08);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 /* 로그인/회원가입 등 강조용 알약 버튼 */
