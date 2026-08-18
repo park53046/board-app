@@ -65,6 +65,7 @@ export default function IntroPage() {
   const [nContent, setNContent] = useState("");
   const [nSubmitting, setNSubmitting] = useState(false);
   const [nMsg, setNMsg] = useState("");
+  const [nFileName, setNFileName] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -117,6 +118,7 @@ export default function IntroPage() {
         const d = await r.json();
         if (!r.ok) { setNMsg(d.error || "업로드에 실패했습니다."); return; }
         if (fileRef.current) fileRef.current.value = "";
+        setNFileName("");
       }
       setNTitle("");
       setNContent("");
@@ -256,7 +258,19 @@ export default function IntroPage() {
                   </>
                 ) : (
                   <div>
-                    <input ref={fileRef} type="file" accept="image/*" className="nform-file" />
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={() => setNFileName(fileRef.current?.files?.[0]?.name ?? "")}
+                    />
+                    <div className="nform-pickrow">
+                      <button type="button" className="nform-pick" onClick={() => fileRef.current?.click()}>
+                        📷 이미지 선택
+                      </button>
+                      <span className="nform-filename">{nFileName || "선택된 파일 없음"}</span>
+                    </div>
                     <p className="nform-hint">이미지 파일만, 10MB 이내</p>
                   </div>
                 )}
@@ -772,10 +786,29 @@ export default function IntroPage() {
           color: #fff;
           border-color: #d97706;
         }
-        .nform-file {
-          width: 100%;
+        .nform-pickrow {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .nform-pick {
+          background: #fff;
+          border: 1px solid #e2c9a8;
+          border-radius: 8px;
+          padding: 8px 14px;
           font-size: 13px;
-          color: #334155;
+          font-weight: 700;
+          color: #92400e;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .nform-pick:hover {
+          background: #fff7ed;
+        }
+        .nform-filename {
+          font-size: 13px;
+          color: #64748b;
         }
         .nform-hint {
           margin: 6px 0 0;
