@@ -42,6 +42,7 @@ export default async function RootLayout({
           <Link href="/mail" className="nav-btn">메일</Link>
           <Link href="/files" className="nav-btn">자료실</Link>
           <Link href="/coding" className="nav-btn">코딩 교실</Link>
+          <Link href="/data-lab" className="nav-btn">데이터 분석</Link>
           <Link href="/news" className="nav-btn">오늘의 뉴스</Link>
           <Link href="/soho" className="nav-btn">Soho</Link>
 
