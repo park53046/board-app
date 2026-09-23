@@ -39,16 +39,10 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/works"
+                href="/data-lab"
                 className="rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110"
               >
-                🚀 코딩 작품 보기
-              </Link>
-              <Link
-                href="/intro"
-                className="rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/15"
-              >
-                교사 소개 →
+                🔬 데이터 분석
               </Link>
             </div>
           </div>
