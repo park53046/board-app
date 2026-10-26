@@ -45,6 +45,7 @@ export default async function RootLayout({
           <Link href="/data-lab" className="nav-btn">데이터 분석</Link>
           <Link href="/news" className="nav-btn">오늘의 뉴스</Link>
           <Link href="/soho" className="nav-btn">Soho</Link>
+          <a href="https://exam-system-seven-gold.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-btn">시험출제</a>
 
           {/* 로그인 상태 영역 (오른쪽) */}
           {session ? (
