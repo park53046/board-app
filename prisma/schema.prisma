@@ -105,3 +105,54 @@ model Comment {
   content    String
   createdAt  DateTime @default(now())
 }
+
+// ───────────── 가계365 (가계부) ─────────────
+model GagyeTx {
+  id          Int      @id @default(autoincrement())
+  date        String   // YYYY-MM-DD (한국 시간 기준)
+  year        Int
+  month       Int
+  type        String   // 수입 | 지출 | 저축
+  major       String   // 대분류
+  minor       String   @default("") // 소분류
+  content     String   @default("") // 내용/사용처
+  amount      Int
+  payment     String   @default("")
+  nature      String   @default("") // 고정지출 | 변동지출 | 낭비지출
+  memo        String   @default("")
+  receiptId   Int?
+  recurringId Int?
+  createdAt   DateTime @default(now())
+
+  @@index([year, month])
+  @@index([date])
+}
+
+model GagyeReceipt {
+  id        Int      @id @default(autoincrement())
+  mime      String
+  data      String   // base64 (압축된 이미지 또는 PDF)
+  createdAt DateTime @default(now())
+}
+
+model GagyeRecurring {
+  id        Int      @id @default(autoincrement())
+  active    Boolean  @default(true)
+  type      String
+  major     String
+  minor     String   @default("")
+  content   String   @default("")
+  amount    Int
+  payment   String   @default("")
+  nature    String   @default("")
+  day       Int      // 1~31 (31 = 말일)
+  start     String   // YYYY-MM
+  end       String   @default("") // YYYY-MM, 비우면 계속
+  last      String   @default("") // 마지막으로 기록한 YYYY-MM
+  createdAt DateTime @default(now())
+}
+
+model GagyeSetting {
+  key   String @id
+  value String // JSON
+}
