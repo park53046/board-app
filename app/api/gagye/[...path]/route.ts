@@ -10,6 +10,7 @@ import {
 import { changePin, isUnlocked, lock, unlock } from "@/lib/gagye/auth";
 import { analyzeReceipt } from "@/lib/gagye/receipt";
 import { exportYear, importWorkbook } from "@/lib/gagye/excel";
+import { checkHookKey, getHookConfig, getHookLog, handleHook, newCardAlerts, previewHook, setHookPayment } from "@/lib/gagye/hook";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,6 +50,16 @@ async function handle(req: NextRequest, ctx: Ctx) {
     return ok({ ok: true, added: await processRecurring() });
   }
 
+  if (a === "hook" && !b && method === "POST") {
+    // 휴대폰(MacroDroid 등)에서 카드 승인 알림을 보내는 주소 — 비밀 키(X-Gagye-Key 헤더)로만 허용
+    const authz = req.headers.get("authorization") || "";
+    const key = req.headers.get("x-gagye-key") || (authz.startsWith("Bearer ") ? authz.slice(7) : "");
+    if (!(await checkHookKey(key.trim()))) return err("forbidden", 403);
+    const text = await hookText(req);
+    if (!text.trim()) return err("내용이 비어 있어요.");
+    return ok(await handleHook(text.slice(0, 2000)));
+  }
+
   if (!(await isUnlocked())) return err("AUTH_REQUIRED", 401);
 
   /* ── 시작 데이터 ── */
@@ -56,8 +67,8 @@ async function handle(req: NextRequest, ctx: Ctx) {
     let autoAdded = 0;
     try { autoAdded = await processRecurring(); } catch (e) { console.error("고정 항목 처리 실패", e); }
     const now = kstNow();
-    const [config, dash, recurring, years] = await Promise.all([getConfig(), getDashboard(now.y, now.m), listRecurring(), getYears()]);
-    return ok({ config, dash, recurring, years, autoAdded, now, hasKey: !!process.env.GEMINI_API_KEY });
+    const [config, dash, recurring, years, cardAlerts] = await Promise.all([getConfig(), getDashboard(now.y, now.m), listRecurring(), getYears(), newCardAlerts()]);
+    return ok({ config, dash, recurring, years, autoAdded, cardAlerts, now, hasKey: !!process.env.GEMINI_API_KEY });
   }
 
   if (a === "dashboard" && method === "GET") {
@@ -154,6 +165,14 @@ async function handle(req: NextRequest, ctx: Ctx) {
     return ok({ ok: true, result: await importWorkbook(await file.arrayBuffer()), config: await getConfig() });
   }
 
+  /* ── 카드 알림 자동 기록 설정 ── */
+  if (a === "hook") {
+    if (b === "config" && method === "GET") return ok({ ...(await getHookConfig()), log: await getHookLog() });
+    if (b === "rotate" && method === "POST") return ok({ ...(await getHookConfig(true)), log: await getHookLog() });
+    if (b === "payment" && method === "POST") { await setHookPayment(String((await body(req)).payment || "")); return ok({ ok: true }); }
+    if (b === "test" && method === "POST") return ok(await previewHook(String((await body(req)).text || "").slice(0, 2000)));
+  }
+
   /* ── 설정 ── */
   if (a === "settings") {
     if (method === "GET") return ok(await getConfig());
@@ -166,6 +185,23 @@ async function handle(req: NextRequest, ctx: Ctx) {
   }
 
   return err("not found", 404);
+}
+
+/** 휴대폰 자동화 앱이 보내는 본문(JSON·폼·일반 텍스트 모두 허용)에서 알림 글자를 꺼냄 */
+async function hookText(req: NextRequest): Promise<string> {
+  const raw = await req.text();
+  const ct = req.headers.get("content-type") || "";
+  try {
+    if (ct.includes("json") || raw.trim().startsWith("{")) {
+      const j = JSON.parse(raw) as Record<string, unknown>;
+      return ["title", "text", "message", "body", "notification", "sms"].map((k) => j[k]).filter((v) => typeof v === "string" && v).join("\n");
+    }
+    if (ct.includes("x-www-form-urlencoded")) {
+      const f = new URLSearchParams(raw);
+      return ["title", "text", "message", "body"].map((k) => f.get(k)).filter(Boolean).join("\n");
+    }
+  } catch { /* 일반 텍스트로 처리 */ }
+  return raw;
 }
 
 async function safe(req: NextRequest, ctx: Ctx) {

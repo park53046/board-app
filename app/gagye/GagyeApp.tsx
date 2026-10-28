@@ -29,7 +29,7 @@ type Annual = {
   tax: { label: string; value: number; note: string }[];
 };
 type Now = { y: number; m: number; d: number; ymd: string; ym: string };
-type Boot = { config: Config; dash: Dash; recurring: Rec[]; years: number[]; autoAdded: number; now: Now; hasKey: boolean };
+type Boot = { config: Config; dash: Dash; recurring: Rec[]; years: number[]; autoAdded: number; cardAlerts: number; now: Now; hasKey: boolean };
 type View = "home" | "list" | "add" | "fixed" | "annual" | "settings";
 type ReceiptRes = {
   isReceipt: boolean; date: string; store: string; total: number; payment: string; category: string; subcategory: string;
@@ -221,9 +221,13 @@ export default function GagyeApp() {
       const d = await call(api<Dash>(`dashboard?y=${cur.y}&m=${cur.m}`));
       if (d) applyDash(d);
     } else applyDash(b.dash);
-    if (b.autoAdded) {
-      setBanner(`고정 항목 ${b.autoAdded}건이 자동으로 기록되었어요.`);
-      setTimeout(() => setBanner(""), 6000);
+    const msgs = [
+      b.cardAlerts ? `카드 결제 알림으로 ${b.cardAlerts}건이 자동 기록됐어요 (🔔 표시). 카테고리가 맞는지 한번 확인해 보세요.` : "",
+      b.autoAdded ? `고정 항목 ${b.autoAdded}건이 자동으로 기록되었어요.` : "",
+    ].filter(Boolean);
+    if (msgs.length) {
+      setBanner(msgs.join(" "));
+      setTimeout(() => setBanner(""), 9000);
     }
   }, [applyDash, call, cur]);
 
@@ -406,7 +410,7 @@ function TxRow({ t, onClick }: { t: Tx; onClick?: () => void }) {
     <button className="tx" onClick={onClick}>
       <div className={`ico ${c}`}>{icon(t.major)}</div>
       <div className="mid">
-        <b>{t.content || t.minor || t.major}{t.receiptId ? " 🧾" : ""}{t.auto ? " 🔁" : ""}</b>
+        <b>{t.content || t.minor || t.major}{t.receiptId ? " 🧾" : ""}{t.auto ? " 🔁" : ""}{t.memo.startsWith("[카드알림]") ? " 🔔" : ""}</b>
         <small>{mdLabel(t.date)} · {t.minor || t.major}{t.payment ? ` · ${t.payment}` : ""}</small>
       </div>
       <div className={`amt ${c}`}>{t.type === "수입" ? "+" : "-"}{won(t.amount)}</div>
@@ -1201,6 +1205,7 @@ function SettingsView({ config, setConfig, call, toast, years, afterImport }: {
       </div>
 
       <div className="col">
+        <CardHookCard config={config} call={call} toast={toast} />
         <div className="card">
           <h3>카테고리 편집</h3>
           <div className="seg">{(["지출", "수입", "저축"] as TxType[]).map((t) => <button key={t} data-t={t} className={ctype === t ? "on" : ""} onClick={() => setCtype(t)}>{t}</button>)}</div>
@@ -1224,6 +1229,126 @@ function SettingsView({ config, setConfig, call, toast, years, afterImport }: {
           <p className="muted" style={{ marginTop: 10 }}>바꾼 뒤 왼쪽의 [설정 저장]을 눌러야 반영돼요.</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ───────────── 카드 결제 자동 기록 (안드로이드) ───────────── */
+type HookInfo = { key: string; payment: string; log: { at: string; text: string; result: string; detail: string }[] };
+type HookPreview = {
+  parsed: { kind: string; reason?: string; amount: number; date: string; time: string; merchant: string; card: string; installment: string };
+  guess: { major: string; minor: string; how: string } | null;
+};
+
+function CardHookCard({ config, call, toast }: { config: Config; call: CallFn; toast: (m: string) => void }) {
+  const [info, setInfo] = useState<HookInfo | null>(null);
+  const [show, setShow] = useState(false);
+  const [guide, setGuide] = useState(false);
+  const [sample, setSample] = useState("");
+  const [preview, setPreview] = useState<HookPreview | null>(null);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const url = `${origin}/api/gagye/hook`;
+
+  useEffect(() => {
+    let alive = true;
+    call(api<HookInfo>("hook/config")).then((r) => { if (alive && r) setInfo(r); });
+    return () => { alive = false; };
+  }, [call]);
+
+  const copy = async (v: string, what: string) => {
+    try { await navigator.clipboard.writeText(v); toast(`${what}를 복사했어요`); } catch { toast("복사하지 못했어요. 길게 눌러 복사해 주세요"); }
+  };
+  const rotate = async () => {
+    if (!confirm("새 키를 만들면 휴대폰에 넣어 둔 예전 키는 더 이상 작동하지 않아요. 바꿀까요?")) return;
+    const r = await call(api<HookInfo>("hook/rotate", { method: "POST" }));
+    if (r) { setInfo(r); setShow(true); toast("새 키를 만들었어요"); }
+  };
+  const setPay = async (p: string) => {
+    if (!info) return;
+    setInfo({ ...info, payment: p });
+    await call(api("hook/payment", { body: { payment: p } }));
+  };
+  const test = async () => {
+    if (!sample.trim()) return toast("알림 내용을 붙여 넣어 주세요");
+    const r = await call(api<HookPreview>("hook/test", { body: { text: sample } }));
+    if (r) setPreview(r);
+  };
+  const refreshLog = async () => {
+    const r = await call(api<HookInfo>("hook/config"));
+    if (r) setInfo(r);
+  };
+
+  const masked = info ? (show ? info.key : `${info.key.slice(0, 4)}${"•".repeat(14)}`) : "...";
+  const p = preview?.parsed;
+
+  return (
+    <div className="card">
+      <h3>💳 카드 결제 자동 기록 <small>안드로이드</small></h3>
+      <p className="muted">농협카드 앱(NH pay) 알림이나 결제 문자를 휴대폰이 아래 주소로 보내면, 금액·날짜·가맹점을 읽어 지출로 바로 기록해요. 카드번호는 저장하지 않아요.</p>
+
+      <label className="flabel">받는 주소 (URL)</label>
+      <div className="addline"><input className="in" readOnly value={url} onFocus={(e) => e.target.select()} /><button className="btn ghost sm" onClick={() => copy(url, "주소")}>복사</button></div>
+      <label className="flabel">헤더 이름 <b style={{ color: "var(--ink)" }}>X-Gagye-Key</b> 에 넣을 비밀 키</label>
+      <div className="addline">
+        <input className="in" readOnly value={masked} style={{ fontFamily: "monospace" }} />
+        <button className="btn ghost sm" onClick={() => setShow(!show)}>{show ? "숨기기" : "보기"}</button>
+        <button className="btn ghost sm" disabled={!info} onClick={() => info && copy(info.key, "키")}>복사</button>
+      </div>
+      <button className="link" style={{ marginTop: 6, color: "var(--exp)" }} onClick={rotate}>키 새로 만들기 (휴대폰을 잃어버렸을 때)</button>
+
+      <label className="flabel">카드 종류를 알 수 없을 때 결제수단</label>
+      <div className="pills">
+        {config.payments.map((x) => <button key={x} className={`pill${info?.payment === x ? " on" : ""}`} onClick={() => setPay(x)}>{PAY_ICON[x] || "💠"} {x}</button>)}
+      </div>
+
+      <div className="gap" />
+      <button className="btn ghost sm" onClick={() => setGuide(!guide)}>{guide ? "설정 방법 닫기" : "휴대폰 설정 방법 (MacroDroid)"}</button>
+      {guide && (
+        <ol className="muted" style={{ paddingLeft: 18, lineHeight: 1.7, marginTop: 10 }}>
+          <li>Play 스토어에서 <b>MacroDroid</b> 설치 → 알림 접근·SMS 권한 허용</li>
+          <li>매크로 추가 → <b>트리거</b>: 알림 수신 → 앱 <b>NH pay(농협카드)</b> → 텍스트에 <b>승인</b> 포함<br />(문자 서비스를 쓰면: SMS 수신 → 내용에 <b>농협</b> 포함)</li>
+          <li><b>동작</b>: HTTP 요청 → 방식 <b>POST</b> → URL에 위 주소</li>
+          <li>헤더 추가: 이름 <b>X-Gagye-Key</b>, 값은 위 비밀 키</li>
+          <li>본문(Body): 콘텐츠 유형 <b>text/plain</b> → 오른쪽 ··· 에서 <b>알림 제목</b>과 <b>알림 텍스트</b>(SMS면 <b>SMS 메시지</b>) 넣기</li>
+          <li>저장 후 휴대폰 설정 → 배터리 → MacroDroid를 <b>절전 예외(제한 없음)</b>로</li>
+          <li>카드를 한 번 쓰고 아래 <b>최근 받은 알림</b>에 &lsquo;기록&rsquo;이 뜨면 완료</li>
+        </ol>
+      )}
+
+      <div className="gap" />
+      <label className="flabel">알림 읽기 테스트 (실제 문자를 붙여 넣어 보세요 — 저장되지 않아요)</label>
+      <textarea className="in" rows={4} style={{ resize: "vertical", fontSize: 14 }} placeholder={"예)\nNH카드1*2*승인\n박*정\n15,000원 체크\n10/28 12:31\n김밥천국 동해점"} value={sample} onChange={(e) => setSample(e.target.value)} />
+      <button className="btn ghost sm" style={{ marginTop: 8 }} onClick={test}>읽어 보기</button>
+      {p && (
+        <div className="items" style={{ display: "block" }}>
+          {p.kind === "ignore" ? <div><span>기록 안 함</span><span>{p.reason}</span></div> : (
+            <>
+              <div><span>처리</span><b>{p.kind === "cancel" ? "승인 취소 → 해당 지출 삭제" : "지출로 기록"}</b></div>
+              <div><span>금액</span><b>{won(p.amount)}원</b></div>
+              <div><span>날짜</span><span>{p.date} {p.time}</span></div>
+              <div><span>가맹점</span><span>{p.merchant || "(못 찾음)"}</span></div>
+              {p.card && <div><span>카드</span><span>{p.card}{p.installment ? ` · ${p.installment}` : ""}</span></div>}
+              {preview?.guess && <div><span>분류</span><span>{icon(preview.guess.major)} {preview.guess.major} / {preview.guess.minor} ({preview.guess.how})</span></div>}
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="gap" />
+      <div className="sec"><span>최근 받은 알림</span><button className="link" onClick={refreshLog}>새로고침</button></div>
+      {!info?.log.length ? <p className="muted">아직 받은 알림이 없어요.</p> : (
+        <div>
+          {info.log.slice(0, 8).map((l, i) => (
+            <div key={i} className="taxrow" style={{ fontSize: 13 }}>
+              <div style={{ minWidth: 0 }}>
+                {l.detail || l.text}
+                <small>{new Date(l.at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</small>
+              </div>
+              <b style={{ color: l.result === "기록" || l.result === "취소 반영" ? "var(--sav)" : "var(--sub)" }}>{l.result}</b>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

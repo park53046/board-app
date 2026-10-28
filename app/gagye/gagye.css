@@ -352,3 +352,4 @@
 .gg .tiles{grid-template-columns:repeat(5,1fr)}
 }
 
+.gg .addline .btn{flex:none;white-space:nowrap}
