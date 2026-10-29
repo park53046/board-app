@@ -353,3 +353,13 @@
 }
 
 .gg .addline .btn{flex:none;white-space:nowrap}
+
+/* 가계부 화면에서는 사이트 공통 메뉴·바닥글을 숨기고 앱처럼 보이게 (다른 페이지에는 영향 없음) */
+body:has(.gg) > nav,
+body:has(.gg) > footer{display:none !important}
+body:has(.gg){background:#f3f4fa;background-image:none}
+body:has(.gg)::before{display:none}
+@media (min-width:900px){
+  body:has(.gg){background:linear-gradient(160deg,#e9ebfb 0%,#f3f4fa 45%,#e6f6f4 100%)}
+  body:has(.gg) .gg{margin-top:24px;margin-bottom:24px}
+}
