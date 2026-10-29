@@ -1150,10 +1150,10 @@ function SettingsView({ config, setConfig, call, toast, years, afterImport }: {
     const form = new FormData();
     form.append("file", f);
     setImportMsg("가져오는 중...");
-    const r = await call(api<{ result: { added: number; skipped: number; recurring: number; settings: boolean; sheets: string[] }; config: Config }>("import", { form }));
+    const r = await call(api<{ result: { added: number; skipped: number; fixed: number; recurring: number; settings: boolean; sheets: string[] }; config: Config }>("import", { form }));
     if (!r) { setImportMsg(""); return; }
     const x = r.result;
-    setImportMsg(`내역 ${x.added}건 추가${x.skipped ? `, 중복·빈 행 ${x.skipped}건 건너뜀` : ""}${x.recurring ? `, 고정 항목 ${x.recurring}개` : ""}${x.settings ? ", 카테고리·예산·이월금 반영" : ""}. ${x.sheets.join(" / ")}`);
+    setImportMsg(`내역 ${x.added}건 추가${x.fixed ? `, 분류 ${x.fixed}건 바로잡음` : ""}${x.skipped ? `, 이미 있는 내역 ${x.skipped}건 건너뜀` : ""}${x.recurring ? `, 고정 항목 ${x.recurring}개` : ""}${x.settings ? ", 카테고리·예산·이월금 반영" : ""}. ${x.sheets.join(" / ")}`);
     setConfig(r.config);
     setDraft(JSON.parse(JSON.stringify(r.config)));
     afterImport();

@@ -129,7 +129,7 @@ export async function importWorkbook(buf: ArrayBuffer) {
   await ensureTables();
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buf);
-  const result = { added: 0, skipped: 0, recurring: 0, settings: false, sheets: [] as string[] };
+  const result = { added: 0, skipped: 0, fixed: 0, recurring: 0, settings: false, sheets: [] as string[] };
 
   // 1) 설정 시트 (구글 시트 가계부 형식)
   const st = wb.getWorksheet("설정");
@@ -173,7 +173,8 @@ export async function importWorkbook(buf: ArrayBuffer) {
     if (!head) continue;
     // 열 위치는 머리글로 찾음 (구글 시트 형식/이 앱의 내보내기 형식 모두 지원)
     const hdr: Record<string, number> = {};
-    ws.getRow(head).eachCell((c, col) => { hdr[cellText(c.value)] = col; });
+    // 같은 이름의 머리글이 오른쪽(카테고리별 집계표 등)에 또 있으므로 '처음 나온 열'만 사용
+    ws.getRow(head).eachCell((c, col) => { const k = cellText(c.value); if (k && !(k in hdr)) hdr[k] = col; });
     const col = (...names: string[]) => names.map((n) => hdr[n]).find(Boolean) || 0;
     const C = {
       date: 1, type: 2, major: col("대분류"), minor: col("소분류"), content: col("내용(사용처)", "내용"),
@@ -191,13 +192,21 @@ export async function importWorkbook(buf: ArrayBuffer) {
       const amount = type === "수입" ? num(g(C.inc)) : num(g(C.out));
       if (!d || amount <= 0) { result.skipped++; continue; }
       const content = cellText(g(C.content));
+      const major = cellText(g(C.major)) || "기타", minor = cellText(g(C.minor));
+      const payment = type === "수입" ? "" : cellText(g(C.pay)), nature = type === "지출" ? cellText(g(C.nat)) : "";
       const dup = await prisma.gagyeTx.findFirst({ where: { date: d.ymd, type, amount, content } });
-      if (dup) { result.skipped++; continue; }
+      if (dup) {
+        // 이미 있는 내역: 분류가 다르면 시트 기준으로 바로잡음 (예전 가져오기 오류 복구)
+        if (dup.major !== major || dup.minor !== minor || dup.payment !== payment || dup.nature !== nature) {
+          await prisma.gagyeTx.update({ where: { id: dup.id }, data: { major, minor, payment, nature } });
+          result.fixed++;
+        } else result.skipped++;
+        continue;
+      }
       await prisma.gagyeTx.create({
         data: {
           date: d.ymd, year: d.y, month: d.m, type, amount, content,
-          major: cellText(g(C.major)) || "기타", minor: cellText(g(C.minor)),
-          payment: type === "수입" ? "" : cellText(g(C.pay)), nature: type === "지출" ? cellText(g(C.nat)) : "",
+          major, minor, payment, nature,
           memo: cellText(g(C.memo)).slice(0, 300),
         },
       });
@@ -210,7 +219,7 @@ export async function importWorkbook(buf: ArrayBuffer) {
   const fx = wb.getWorksheet("고정항목");
   if (fx) {
     const hdr: Record<string, number> = {};
-    fx.getRow(1).eachCell((c, col) => { hdr[cellText(c.value)] = col; });
+    fx.getRow(1).eachCell((c, col) => { const k = cellText(c.value); if (k && !(k in hdr)) hdr[k] = col; });
     if (hdr["구분"] && hdr["금액"]) {
       const existing = await prisma.gagyeRecurring.findMany();
       for (let i = 2; i <= fx.rowCount; i++) {
