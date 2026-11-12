@@ -35,16 +35,14 @@ export default async function RootLayout({
           }}
         >
           <Link href="/" className="nav-btn">홈</Link>
-          <Link href="/intro" className="nav-btn">비키 AI</Link>
+          <Link href="/intro" className="nav-btn">비키ViKi</Link>
           <Link href="/works" className="nav-btn">코딩 작품</Link>
           <Link href="/board" className="nav-btn">게시판</Link>
           <Link href="/board/chat" className="nav-btn">채팅</Link>
-          <Link href="/mail" className="nav-btn">메일</Link>
           <Link href="/files" className="nav-btn">자료실</Link>
           <Link href="/coding" className="nav-btn">코딩 교실</Link>
           <Link href="/data-lab" className="nav-btn">데이터 분석</Link>
           <Link href="/news" className="nav-btn">오늘의 뉴스</Link>
-          <Link href="/soho" className="nav-btn">Soho</Link>
           <a href="https://class-viki.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-btn">클래스룸</a>
 
           {/* 로그인 상태 영역 (오른쪽) */}
