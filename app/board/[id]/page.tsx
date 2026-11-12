@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
-import { deletePostAction, addCommentAction, deleteCommentAction, setPraiseAction } from "../actions";
+import { deletePostAction, setPraiseAction } from "../actions";
 import DeleteButton from "./DeleteButton";
 
 export const dynamic = "force-dynamic";
@@ -30,11 +30,6 @@ export default async function PostDetailPage({
 
   const post = await (prisma as any).boardPost.findUnique({ where: { id: postId } });
   if (!post) notFound();
-
-  const comments = await (prisma as any).comment.findMany({
-    where: { postId },
-    orderBy: { createdAt: "asc" },
-  });
 
   const deleteWithId = deletePostAction.bind(null, postId);
   const isOwner = !!session && post.userId === session.userId;
@@ -86,45 +81,10 @@ export default async function PostDetailPage({
 
         <div style={styles.footer}>
           <Link href="/board" style={styles.backBtn}>← 목록으로</Link>
-          {isOwner && <DeleteButton action={deleteWithId} />}
+          {(isOwner || isAdmin) && <DeleteButton action={deleteWithId} />}
         </div>
       </div>
 
-      {/* 댓글 영역 */}
-      <div style={styles.commentCard}>
-        <h2 style={styles.commentTitle}>💬 교사 코멘트 <span style={styles.commentCount}>({comments.length})</span></h2>
-
-        {comments.length === 0 ? (
-          <p style={styles.noComment}>아직 코멘트가 없어요.</p>
-        ) : (
-          <ul style={styles.commentList}>
-            {comments.map((c: any) => (
-              <li key={c.id} style={styles.commentItem}>
-                <div style={styles.commentHead}>
-                  <span style={styles.teacherBadge}>교사</span>
-                  <span style={styles.commentAuthor}>{c.authorName}</span>
-                  <span style={styles.commentDate}>{new Date(c.createdAt).toLocaleDateString("ko-KR")}</span>
-                  {isAdmin && (
-                    <form action={deleteCommentAction.bind(null, c.id, postId)} style={{ marginLeft: "auto" }}>
-                      <button type="submit" style={styles.commentDel}>삭제</button>
-                    </form>
-                  )}
-                </div>
-                <p style={styles.commentBody}>{c.content}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {isAdmin ? (
-          <form action={addCommentAction.bind(null, postId)} style={styles.commentForm}>
-            <textarea name="content" required rows={3} placeholder="학생에게 코멘트를 남겨주세요" style={styles.commentInput} />
-            <button type="submit" style={styles.commentSubmit}>코멘트 등록</button>
-          </form>
-        ) : (
-          <p style={styles.commentHint}>코멘트는 교사만 작성할 수 있어요.</p>
-        )}
-      </div>
     </div>
   );
 }
@@ -148,20 +108,4 @@ const styles: Record<string, React.CSSProperties> = {
   footer: { display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 24, paddingTop: 20, borderTop: "1px solid #f1f5f9" },
   backBtn: { fontSize: 14, color: "#64748b", textDecoration: "none" },
 
-  commentCard: { background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: "24px", boxShadow: "0 2px 12px rgba(0,0,0,.05)" },
-  commentTitle: { margin: "0 0 16px", fontSize: 17, fontWeight: 700, color: "#1a2b4a" },
-  commentCount: { fontSize: 14, color: "#64748b", fontWeight: 600 },
-  noComment: { color: "#94a3b8", fontSize: 14, padding: "8px 0 16px" },
-  commentList: { listStyle: "none", margin: "0 0 16px", padding: 0, display: "flex", flexDirection: "column", gap: 12 },
-  commentItem: { background: "#f8fafc", border: "1px solid #eef2f7", borderRadius: 10, padding: "12px 14px" },
-  commentHead: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 },
-  teacherBadge: { fontSize: 11, fontWeight: 700, color: "#fff", background: "#0891b2", padding: "2px 8px", borderRadius: 20 },
-  commentAuthor: { fontSize: 13, fontWeight: 700, color: "#1e293b" },
-  commentDate: { fontSize: 12, color: "#94a3b8" },
-  commentDel: { fontSize: 12, background: "transparent", border: "none", color: "#cbd5e1", cursor: "pointer" },
-  commentBody: { margin: 0, fontSize: 14, color: "#334155", lineHeight: 1.6, whiteSpace: "pre-wrap" },
-  commentForm: { display: "flex", flexDirection: "column", gap: 8 },
-  commentInput: { width: "100%", boxSizing: "border-box", padding: "10px 12px", border: "1px solid #d1d5db", borderRadius: 10, fontSize: 14, outline: "none", color: "#111827", background: "#fff", resize: "vertical", fontFamily: "inherit" },
-  commentSubmit: { alignSelf: "flex-start", padding: "9px 20px", background: "#0891b2", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer" },
-  commentHint: { fontSize: 13, color: "#94a3b8", textAlign: "center", padding: "8px 0" },
 };

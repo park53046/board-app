@@ -139,11 +139,20 @@ export async function deletePostAction(postId: number): Promise<void> {
   const session = await getSession();
   if (!session) redirect("/board/login");
 
-  // 본인 글인지 확인 후 삭제
-  await (prisma as any).boardPost.deleteMany({
-    where: { id: postId, userId: session.userId },
-  });
+  // 본인 글이거나 관리자면 삭제
+  const where = session.isAdmin ? { id: postId } : { id: postId, userId: session.userId };
+  const r = await (prisma as any).boardPost.deleteMany({ where });
+  if (r.count > 0) await (prisma as any).comment.deleteMany({ where: { postId } });
 
   revalidatePath("/board");
   redirect("/board");
+}
+
+// 관리자: 목록에서 바로 게시글 삭제 (페이지 이동 없음)
+export async function adminDeletePostAction(postId: number): Promise<void> {
+  const session = await getSession();
+  if (!session?.isAdmin) return;
+  await (prisma as any).boardPost.deleteMany({ where: { id: postId } });
+  await (prisma as any).comment.deleteMany({ where: { postId } });
+  revalidatePath("/board");
 }
