@@ -116,21 +116,18 @@ function AdminTable({ posts, commentMap }: { posts: any[]; commentMap: Map<numbe
               <th style={styles.th}>성명</th>
               <th style={styles.th}>과목</th>
               <th style={styles.th}>제목</th>
-              <th style={styles.th}>교사 코멘트</th>
               <th style={styles.th}>작성일</th>
             </tr>
           </thead>
           <tbody>
             {posts.map((p) => {
-              const cs = commentMap.get(p.id) ?? [];
-              const last = cs[cs.length - 1];
               return (
                 <tr key={p.id} style={styles.tr}>
-                  <td style={styles.td}>{p.user?.affil ?? "-"}</td>
+                  <td style={{ ...styles.td, whiteSpace: "nowrap" }}>{p.user?.affil ?? "-"}</td>
                   <td style={styles.td}>{p.user?.studentId ?? "-"}</td>
                   <td style={styles.td}>{p.user?.name ?? "-"}</td>
-                  <td style={styles.td}>
-                    <span style={{ ...styles.tag, background: SUBJECT_COLOR[p.subject] ?? "#64748b" }}>
+                  <td style={{ ...styles.td, whiteSpace: "nowrap", minWidth: 110 }}>
+                    <span style={{ ...styles.tag, whiteSpace: "nowrap", background: SUBJECT_COLOR[p.subject] ?? "#64748b" }}>
                       {p.subject}
                     </span>
                   </td>
@@ -139,16 +136,6 @@ function AdminTable({ posts, commentMap }: { posts: any[]; commentMap: Map<numbe
                       {p.title}
                     </Link>{" "}
                     {p.praise && <span title="교사 칭찬">{p.praise}</span>}
-                  </td>
-                  <td style={styles.td}>
-                    {last ? (
-                      <span style={styles.commentCell}>
-                        💬 {String(last.content).slice(0, 24)}{String(last.content).length > 24 ? "…" : ""}
-                        {cs.length > 1 ? ` (외 ${cs.length - 1})` : ""}
-                      </span>
-                    ) : (
-                      <span style={styles.commentEmpty}>—</span>
-                    )}
                   </td>
                   <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
                     {new Date(p.createdAt).toLocaleDateString("ko-KR")}
